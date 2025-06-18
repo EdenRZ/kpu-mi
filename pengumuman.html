@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengumuman Hasil Pemilihan - KPU Monasmuda Institute</title>
+
+    <!-- Try local files first, fallback to CDN -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css';">
+    <link href="css/fontawesome.min.css" rel="stylesheet" onerror="this.onerror=null;this.href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';">
+
+    <!-- Chart.js with fallback -->
+    <script src="js/chart.min.js" onerror="loadChartJSFallback()"></script>
+    <script>
+        function loadChartJSFallback() {
+            console.log('📊 Loading Chart.js from CDN fallback...');
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+            script.onload = function() {
+                console.log('✅ Chart.js loaded from CDN');
+            };
+            script.onerror = function() {
+                console.warn('⚠️ Chart.js failed to load from CDN - charts will be disabled');
+            };
+            document.head.appendChild(script);
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-bg: #ecf0f1;
+            --dark-text: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--light-bg) 0%, #bdc3c7 100%);
+            min-height: 100vh;
+            color: var(--dark-text);
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .logo-container img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .results-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .results-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 1.5rem;
+            border: none;
+        }
+
+        .vote-item {
+            background: #f8f9fa;
+            border-left: 4px solid var(--secondary-color);
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+            transition: all 0.3s ease;
+        }
+
+        .vote-item:hover {
+            background: #e9ecef;
+            border-left-color: var(--accent-color);
+        }
+
+        .candidate-name {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .vote-count {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--success-color);
+        }
+
+        .timestamp {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .voter-id {
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stats-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, var(--success-color) 0%, #2ecc71 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 0.75rem 2rem;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 2rem 0;
+        }
+
+        .real-time-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .category-tabs {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-pills .nav-link {
+            border-radius: 25px;
+            margin: 0 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-pills .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+
+        .detail-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .table th {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            font-weight: 500;
+        }
+
+        .table td {
+            border-color: #dee2e6;
+            vertical-align: middle;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .footer-info {
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Real-time Indicator -->
+    <div class="real-time-indicator" id="realTimeIndicator">
+        <i class="fas fa-circle me-1"></i> LIVE
+    </div>
+
+    <!-- Database Status Indicator -->
+    <div class="real-time-indicator" id="dbStatusIndicator" style="top: 70px; background: #f39c12;">
+        <i class="fas fa-database me-1"></i> <span id="dbStatusText">CONNECTING...</span>
+    </div>
+
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="container">
+            <div class="logo-container">
+                <img src="kandidat/kpulogo.jpg" alt="KPU MI Logo" id="logoImage">
+            </div>
+            <h1 class="text-center mb-0">
+                <i class="fas fa-chart-bar me-2"></i>
+                Pengumuman Hasil Pemilihan
+            </h1>
+            <p class="text-center mb-0 mt-2">KPU Monasmuda Institute - Real Time Results</p>
+            <div class="text-center mt-3">
+                <button class="btn refresh-btn me-2" onclick="refreshData()">
+                    <i class="fas fa-sync-alt me-2"></i>
+                    Refresh Data
+                </button>
+                <button class="btn btn-outline-light" onclick="forceRefresh()">
+                    <i class="fas fa-redo me-2"></i>
+                    Force Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Statistics Overview -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalVoters">0</div>
+                    <div class="stats-label">Total Pemilih</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number" id="votedCount">0</div>
+                    <div class="stats-label">Sudah Memilih</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalVotes">0</div>
+                    <div class="stats-label">Total Suara</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number" id="participationRate">0%</div>
+                    <div class="stats-label">Partisipasi</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="category-tabs">
+            <ul class="nav nav-pills justify-content-center" id="categoryTabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-category="all" href="#" onclick="showCategory('all')">
+                        <i class="fas fa-chart-pie me-2"></i>Semua Kategori
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-category="presiden" href="#" onclick="showCategory('presiden')">
+                        <i class="fas fa-crown me-2"></i>Presiden
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-category="pm" href="#" onclick="showCategory('pm')">
+                        <i class="fas fa-user-tie me-2"></i>Perdana Menteri
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-category="parlemen" href="#" onclick="showCategory('parlemen')">
+                        <i class="fas fa-users me-2"></i>Parlemen
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Memuat data...</p>
+        </div>
+
+        <!-- Results Content -->
+        <div id="resultsContent">
+            <!-- Results will be loaded here -->
+        </div>
+
+        <!-- Voting Details Table -->
+        <div class="results-card">
+            <div class="card-header-custom">
+                <h4 class="mb-0">
+                    <i class="fas fa-list-alt me-2"></i>
+                    Detail Aktivitas Voting
+                </h4>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="votingDetailsTable">
+                        <thead>
+                            <tr>
+                                <th>ID Pemilih</th>
+                                <th>Kategori</th>
+                                <th>Kandidat</th>
+                                <th>Jumlah Suara</th>
+                                <th>Waktu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="votingDetailsBody">
+                            <!-- Voting details will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-info">
+        <p class="mb-0">
+            <i class="fas fa-shield-alt me-2"></i>
+            KPU Monasmuda Institute - Sistem Pemilihan Elektronik
+        </p>
+        <small>Data diperbarui secara real-time setiap 30 detik</small>
+    </div>
+
+    <!-- Bootstrap JS with fallback -->
+    <script src="js/bootstrap.bundle.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js';"></script>
+
+    <!-- Custom JavaScript -->
+    <script src="js/pengumuman.js"></script>
+</body>
+</html>

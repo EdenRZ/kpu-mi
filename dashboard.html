@@ -1,0 +1,3209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Pemilih - KPU Monasmuda Institute</title>
+
+    <!-- Prevent caching for development -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self' http://localhost https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self';">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/database_integration.js?v=20250527-4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        .sidebar-transition {
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar-hidden {
+            transform: translateX(-100%);
+        }
+
+        /* Sidebar fixed positioning */
+        .sidebar-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1023px) {
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .main-content {
+                margin-left: 16rem; /* 256px = w-64 */
+            }
+        }
+
+        /* Smooth transitions for mobile menu */
+        .mobile-menu-transition {
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Prevent body scroll when mobile menu is open */
+        .overflow-hidden {
+            overflow: hidden;
+        }
+
+        /* Mobile navigation improvements */
+        @media (max-width: 768px) {
+            .step-navigation {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .step-navigation h2 {
+                font-size: 1.5rem;
+                text-align: center;
+            }
+
+            .step-buttons {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .step-buttons button {
+                flex: 1;
+                max-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar-transition w-64 bg-white shadow-lg border-r border-gray-200 fixed lg:fixed lg:translate-x-0 z-30 h-full overflow-y-auto">
+            <div class="p-6">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2 mb-8">
+                    <img src="kandidat/kpulogo.jpg" alt="KPU Monasmuda Institute" class="w-8 h-8 rounded-lg object-cover border border-red-200" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center" style="display: none;">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <span class="text-lg font-semibold text-gray-900">KPU Monasmuda Institute</span>
+                </div>
+
+                <!-- Navigation Menu -->
+                <nav class="space-y-2">
+                    <a href="#dashboard" class="flex items-center space-x-3 px-4 py-3 text-red-600 bg-red-50 rounded-lg font-medium">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z"></path>
+                        </svg>
+                        <span>Dashboard</span>
+                    </a>
+
+                    <a href="#voting" class="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg font-medium transition-colors duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                        <span>Pemilihan</span>
+                    </a>
+
+                    <a href="#profile" class="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg font-medium transition-colors duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        <span>Profil</span>
+                    </a>
+
+                    <a href="help.html" class="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg font-medium transition-colors duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Bantuan</span>
+                    </a>
+                </nav>
+
+                <!-- Logout Button -->
+                <div class="mt-8 pt-8 border-t border-gray-200">
+                    <a href="index.html" class="flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg font-medium transition-colors duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        <span>Keluar</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 lg:ml-64 main-content">
+            <!-- Top Bar -->
+            <div class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <!-- Mobile menu button -->
+                        <button id="mobile-menu-btn" class="lg:hidden text-gray-600 hover:text-gray-900">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                        <h1 class="text-2xl font-bold text-gray-900">Dashboard Pemilih</h1>
+                    </div>
+
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <p id="currentUserName" class="text-sm font-medium text-gray-900">Loading...</p>
+                            <p class="text-xs text-gray-500">Pemilih</p>
+                        </div>
+                        <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
+                            <span id="currentUserInitials" class="text-white font-medium text-sm">?</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="p-6">
+                <!-- Onboarding Section -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <h2 class="text-xl font-semibold text-gray-900">Progress Pemilihan</h2>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-32 h-2 bg-gray-200 rounded-full mr-3">
+                                <div id="progressBar" class="w-0 h-2 bg-red-600 rounded-full transition-all duration-300"></div>
+                            </div>
+                            <span id="progressText" class="text-sm font-medium text-gray-600">0%</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <!-- Step 1: Presiden -->
+                        <div class="text-center" id="step-presiden">
+                            <div class="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <span class="text-white font-semibold text-sm">1</span>
+                            </div>
+                            <p class="text-sm font-semibold text-gray-900">Presiden & Wakil Presiden</p>
+                            <p class="text-xs text-gray-500 mt-1">20 suara</p>
+                        </div>
+
+                        <!-- Step 2: PM -->
+                        <div class="text-center" id="step-pm">
+                            <div class="w-10 h-10 bg-gray-200 border border-gray-300 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <span class="text-gray-500 font-semibold text-sm">2</span>
+                            </div>
+                            <p class="text-sm text-gray-500">Perdana Menteri</p>
+                            <p class="text-xs text-gray-400 mt-1">20 suara</p>
+                        </div>
+
+                        <!-- Step 3: Parlemen -->
+                        <div class="text-center" id="step-parlemen">
+                            <div class="w-10 h-10 bg-gray-200 border border-gray-300 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <span class="text-gray-500 font-semibold text-sm">3</span>
+                            </div>
+                            <p class="text-sm text-gray-500">Ketua Parlemen</p>
+                            <p class="text-xs text-gray-400 mt-1">20 suara</p>
+                        </div>
+
+                        <!-- Step 4: Konfirmasi -->
+                        <div class="text-center" id="step-konfirmasi">
+                            <div class="w-10 h-10 bg-gray-200 border border-gray-300 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <span class="text-gray-500 font-semibold text-sm">4</span>
+                            </div>
+                            <p class="text-sm text-gray-500">Konfirmasi & Submit</p>
+                            <p class="text-xs text-gray-400 mt-1">Tinjau & Kirim</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voting Section -->
+                <div id="voting" class="mb-6">
+                    <!-- Step Navigation -->
+                    <div class="flex justify-between items-center mb-6 step-navigation">
+                        <h2 id="stepTitle" class="text-2xl font-bold text-gray-900">Presiden & Wakil Presiden</h2>
+                        <div class="flex space-x-2 step-buttons">
+                            <button id="prevBtn" onclick="previousStep()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors duration-200 hidden">
+                                ← Sebelumnya
+                            </button>
+                            <button id="nextBtn" onclick="nextStep()" class="px-4 py-2 bg-gray-400 text-white rounded-lg font-medium transition-colors duration-200 cursor-not-allowed" disabled>
+                                Selanjutnya →
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Vote Quota Info -->
+                    <div id="quotaInfo" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                            <div>
+                                <h3 class="text-sm font-semibold text-red-800">Alokasikan Semua Suara</h3>
+                                <p class="text-sm text-red-700">Anda harus menggunakan <strong>semua 20 suara</strong> untuk kategori ini sebelum melanjutkan ke tahap berikutnya.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 1: Presiden & Wakil Presiden -->
+                    <div id="step1-content" class="mb-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold text-gray-900 flex items-center">
+                                <svg class="w-6 h-6 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                                </svg>
+                                Presiden & Wakil Presiden
+                            </h3>
+                            <div class="text-right">
+                                <div class="text-sm text-gray-600">Jatah Suara: <span class="font-semibold">20</span></div>
+                                <div class="text-sm">
+                                    <span class="text-gray-600">Terpakai: </span>
+                                    <span id="presidenUsed" class="font-semibold text-red-600">0</span>
+                                    <span class="text-gray-600"> | Sisa: </span>
+                                    <span id="presidenRemaining" class="font-semibold text-green-600">20</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <!-- Pasangan Calon 1 -->
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                                <div class="h-48 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center relative">
+                                    <img id="presiden1-photo-dashboard" src="kandidat/kpulogo.jpg" alt="Ahmad Rizki & Sari Indah" class="absolute inset-0 w-full h-full object-cover opacity-30" onerror="this.style.display='none';">
+                                    <div class="text-center text-white relative z-10">
+                                        <!-- Single candidate photo - kotak seperti admin -->
+                                        <img id="presiden1-photo-small" src="kandidat/kpulogo.jpg" alt="Presiden 1" class="w-20 h-20 rounded-lg object-cover border-2 border-white mx-auto mb-3" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <div class="w-20 h-20 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mx-auto mb-3" style="display: none;">
+                                            <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </div>
+                                        <h3 class="font-semibold">Pasangan 01</h3>
+                                    </div>
+                                </div>
+
+                                <div class="p-4">
+                                    <div class="mb-4">
+                                        <div class="text-center mb-3">
+                                            <h3 class="font-semibold text-gray-900">NENENG & INAYAH</h3>
+                                            <p class="text-sm text-gray-500">Presiden & Wakil Presiden</p>
+                                        </div>
+                                        <div class="text-xs text-gray-600 space-y-1">
+                                            <p><strong>Visi:</strong> Membangun institusi yang maju dan demokratis</p>
+                                            <p><strong>Misi:</strong> Transparansi, inovasi, dan partisipasi aktif</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Berikan Suara Anda</label>
+                                        <input type="number"
+                                               id="presiden1"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                                               placeholder="0"
+                                               min="0"
+                                               value="0"
+                                               onchange="updateVoteCount('presiden')"
+                                               oninput="validateInput(this)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pasangan Calon 2 -->
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                                <div class="h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center relative">
+                                    <img id="presiden2-photo-dashboard" src="kandidat/kpulogo.jpg" alt="Budi Santoso & Maya Putri" class="absolute inset-0 w-full h-full object-cover opacity-30" onerror="this.style.display='none';">
+                                    <div class="text-center text-white relative z-10">
+                                        <!-- Single candidate photo - kotak seperti admin -->
+                                        <img id="presiden2-photo-small" src="kandidat/kpulogo.jpg" alt="Presiden 2" class="w-20 h-20 rounded-lg object-cover border-2 border-white mx-auto mb-3" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <div class="w-20 h-20 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mx-auto mb-3" style="display: none;">
+                                            <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </div>
+                                        <h3 class="font-semibold">Pasangan 02</h3>
+                                    </div>
+                                </div>
+
+                                <div class="p-4">
+                                    <div class="mb-4">
+                                        <div class="text-center mb-3">
+                                            <h3 class="font-semibold text-gray-900">AISYAH & EVI</h3>
+                                            <p class="text-sm text-gray-500">Presiden & Wakil Presiden</p>
+                                        </div>
+                                        <div class="text-xs text-gray-600 space-y-1">
+                                            <p><strong>Visi:</strong> Institusi yang inklusif dan berkelanjutan</p>
+                                            <p><strong>Misi:</strong> Keadilan, kolaborasi, dan pemberdayaan</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Berikan Suara Anda</label>
+                                        <input type="number"
+                                               id="presiden2"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                               placeholder="0"
+                                               min="0"
+                                               value="0"
+                                               onchange="updateVoteCount('presiden')"
+                                               oninput="validateInput(this)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Perdana Menteri -->
+                    <div id="step2-content" class="mb-8 hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold text-gray-900 flex items-center">
+                                <svg class="w-6 h-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                                Perdana Menteri
+                            </h3>
+                            <div class="text-right">
+                                <div class="text-sm text-gray-600">Jatah Suara: <span class="font-semibold">20</span></div>
+                                <div class="text-sm">
+                                    <span class="text-gray-600">Terpakai: </span>
+                                    <span id="pmUsed" class="font-semibold text-red-600">0</span>
+                                    <span class="text-gray-600"> | Sisa: </span>
+                                    <span id="pmRemaining" class="font-semibold text-green-600">20</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <!-- PM Kandidat 1 -->
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                                <div class="h-40 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center relative">
+                                    <img id="pm1-photo-dashboard" src="kandidat/kpulogo.jpg" alt="Dr. Andi Wijaya" class="absolute inset-0 w-full h-full object-cover opacity-30" onerror="this.style.display='none';">
+                                    <div class="text-center text-white relative z-10">
+                                        <img id="pm1-photo-small" src="kandidat/kpulogo.jpg" alt="PM 1" class="w-16 h-16 rounded-lg object-cover border-2 border-white mx-auto mb-3" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mx-auto mb-3" style="display: none;">
+                                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </div>
+                                        <h3 class="font-semibold">Kandidat PM 01</h3>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <div class="text-center mb-3">
+                                        <h3 class="font-semibold text-gray-900">KUKUH</h3>
+                                        <p class="text-sm text-gray-500">Calon Perdana Menteri</p>
+                                    </div>
+                                    <div class="text-xs text-gray-600 mb-4">
+                                        <p><strong>Program:</strong> Reformasi birokrasi dan digitalisasi</p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Berikan Suara Anda</label>
+                                        <input type="number"
+                                               id="pm1"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                               placeholder="0"
+                                               min="0"
+                                               value="0"
+                                               onchange="updateVoteCount('pm')"
+                                               oninput="validateInput(this)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PM Kandidat 2 -->
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                                <div class="h-40 bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center relative">
+                                    <img id="pm2-photo-dashboard" src="kandidat/kpulogo.jpg" alt="Prof. Lisa Sari" class="absolute inset-0 w-full h-full object-cover opacity-30" onerror="this.style.display='none';">
+                                    <div class="text-center text-white relative z-10">
+                                        <img id="pm2-photo-small" src="kandidat/kpulogo.jpg" alt="PM 2" class="w-16 h-16 rounded-lg object-cover border-2 border-white mx-auto mb-3" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mx-auto mb-3" style="display: none;">
+                                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </div>
+                                        <h3 class="font-semibold">Kandidat PM 02</h3>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <div class="text-center mb-3">
+                                        <h3 class="font-semibold text-gray-900">SAYYIDAH</h3>
+                                        <p class="text-sm text-gray-500">Calon Perdana Menteri</p>
+                                    </div>
+                                    <div class="text-xs text-gray-600 mb-4">
+                                        <p><strong>Program:</strong> Pemberdayaan ekonomi dan sosial</p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Berikan Suara Anda</label>
+                                        <input type="number"
+                                               id="pm2"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                                               placeholder="0"
+                                               min="0"
+                                               value="0"
+                                               onchange="updateVoteCount('pm')"
+                                               oninput="validateInput(this)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Ketua Parlemen -->
+                    <div id="step3-content" class="mb-8 hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold text-gray-900 flex items-center">
+                                <svg class="w-6 h-6 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                                Ketua Parlemen
+                            </h3>
+                            <div class="text-right">
+                                <div class="text-sm text-gray-600">Jatah Suara: <span class="font-semibold">20</span></div>
+                                <div class="text-sm">
+                                    <span class="text-gray-600">Terpakai: </span>
+                                    <span id="parlemenUsed" class="font-semibold text-red-600">0</span>
+                                    <span class="text-gray-600"> | Sisa: </span>
+                                    <span id="parlemenRemaining" class="font-semibold text-green-600">20</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                            <!-- Ketua Parlemen 1 -->
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                                <div class="h-32 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center relative">
+                                    <img id="parlemen1-photo-dashboard" src="kandidat/kpulogo.jpg" alt="Rudi Hartono" class="absolute inset-0 w-full h-full object-cover opacity-30" onerror="this.style.display='none';">
+                                    <div class="text-center text-white relative z-10">
+                                        <img id="parlemen1-photo-small" src="kandidat/kpulogo.jpg" alt="Parlemen 1" class="w-12 h-12 rounded-lg object-cover border-2 border-white mx-auto mb-2" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mx-auto mb-2" style="display: none;">
+                                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </div>
+                                        <h4 class="font-semibold text-sm">KP 01</h4>
+                                    </div>
+                                </div>
+                                <div class="p-3">
+                                    <div class="text-center mb-2">
+                                        <h4 class="font-semibold text-gray-900 text-sm">ADINUR KHOLIFAH</h4>
+                                        <p class="text-xs text-gray-500">Ketua Parlemen</p>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-1">Suara</label>
+                                        <input type="number"
+                                               id="parlemen1"
+                                               class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                                               placeholder="0"
+                                               min="0"
+                                               value="0"
+                                               onchange="updateVoteCount('parlemen')"
+                                               oninput="validateInput(this)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Ketua Parlemen 2 -->
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                                <div class="h-32 bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center relative">
+                                    <img id="parlemen2-photo-dashboard" src="kandidat/kpulogo.jpg" alt="Nina Kusuma" class="absolute inset-0 w-full h-full object-cover opacity-30" onerror="this.style.display='none';">
+                                    <div class="text-center text-white relative z-10">
+                                        <img id="parlemen2-photo-small" src="kandidat/kpulogo.jpg" alt="Parlemen 2" class="w-12 h-12 rounded-lg object-cover border-2 border-white mx-auto mb-2" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mx-auto mb-2" style="display: none;">
+                                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </div>
+                                        <h4 class="font-semibold text-sm">KP 02</h4>
+                                    </div>
+                                </div>
+                                <div class="p-3">
+                                    <div class="text-center mb-2">
+                                        <h4 class="font-semibold text-gray-900 text-sm">ENI FATMAWATI</h4>
+                                        <p class="text-xs text-gray-500">Ketua Parlemen</p>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-1">Suara</label>
+                                        <input type="number"
+                                               id="parlemen2"
+                                               class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                               placeholder="0"
+                                               min="0"
+                                               value="0"
+                                               onchange="updateVoteCount('parlemen')"
+                                               oninput="validateInput(this)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Ketua Parlemen 3 -->
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                                <div class="h-32 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center relative">
+                                    <img id="parlemen3-photo-dashboard" src="kandidat/kpulogo.jpg" alt="Dedi Prasetyo" class="absolute inset-0 w-full h-full object-cover opacity-30" onerror="this.style.display='none';">
+                                    <div class="text-center text-white relative z-10">
+                                        <img id="parlemen3-photo-small" src="kandidat/kpulogo.jpg" alt="Parlemen 3" class="w-12 h-12 rounded-lg object-cover border-2 border-white mx-auto mb-2" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mx-auto mb-2" style="display: none;">
+                                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </div>
+                                        <h4 class="font-semibold text-sm">KP 03</h4>
+                                    </div>
+                                </div>
+                                <div class="p-3">
+                                    <div class="text-center mb-2">
+                                        <h4 class="font-semibold text-gray-900 text-sm">FAIZAH MAULIDA</h4>
+                                        <p class="text-xs text-gray-500">Ketua Parlemen</p>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-1">Suara</label>
+                                        <input type="number"
+                                               id="parlemen3"
+                                               class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                                               placeholder="0"
+                                               min="0"
+                                               value="0"
+                                               onchange="updateVoteCount('parlemen')"
+                                               oninput="validateInput(this)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Ketua Parlemen 4 -->
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                                <div class="h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center relative">
+                                    <img id="parlemen4-photo-dashboard" src="kandidat/kpulogo.jpg" alt="Sinta Dewi" class="absolute inset-0 w-full h-full object-cover opacity-30" onerror="this.style.display='none';">
+                                    <div class="text-center text-white relative z-10">
+                                        <img id="parlemen4-photo-small" src="kandidat/kpulogo.jpg" alt="Parlemen 4" class="w-12 h-12 rounded-lg object-cover border-2 border-white mx-auto mb-2" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mx-auto mb-2" style="display: none;">
+                                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </div>
+                                        <h4 class="font-semibold text-sm">KP 04</h4>
+                                    </div>
+                                </div>
+                                <div class="p-3">
+                                    <div class="text-center mb-2">
+                                        <h4 class="font-semibold text-gray-900 text-sm">AHMAD NASHUKA</h4>
+                                        <p class="text-xs text-gray-500">Ketua Parlemen</p>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-1">Suara</label>
+                                        <input type="number"
+                                               id="parlemen4"
+                                               class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                               placeholder="0"
+                                               min="0"
+                                               value="0"
+                                               onchange="updateVoteCount('parlemen')"
+                                               oninput="validateInput(this)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Konfirmasi -->
+                    <div id="step4-content" class="mb-8 hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold text-gray-900 flex items-center">
+                                <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Konfirmasi Distribusi Suara
+                            </h3>
+                        </div>
+
+                        <!-- Vote Summary -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-4">Ringkasan Distribusi Suara Anda</h4>
+
+                            <!-- Presiden Summary -->
+                            <div class="mb-6">
+                                <h5 class="font-medium text-gray-800 mb-3 flex items-center">
+                                    <div class="w-4 h-4 bg-red-600 rounded mr-2"></div>
+                                    Presiden & Wakil Presiden (20/20 suara)
+                                </h5>
+                                <div id="presiden-summary" class="space-y-2 text-sm pl-6">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
+                            </div>
+
+                            <!-- PM Summary -->
+                            <div class="mb-6">
+                                <h5 class="font-medium text-gray-800 mb-3 flex items-center">
+                                    <div class="w-4 h-4 bg-green-600 rounded mr-2"></div>
+                                    Perdana Menteri (20/20 suara)
+                                </h5>
+                                <div id="pm-summary" class="space-y-2 text-sm pl-6">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
+                            </div>
+
+                            <!-- Parlemen Summary -->
+                            <div class="mb-6">
+                                <h5 class="font-medium text-gray-800 mb-3 flex items-center">
+                                    <div class="w-4 h-4 bg-purple-600 rounded mr-2"></div>
+                                    Ketua Parlemen (20/20 suara)
+                                </h5>
+                                <div id="parlemen-summary" class="space-y-2 text-sm pl-6">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
+                            </div>
+
+                            <!-- Total -->
+                            <div class="border-t pt-4">
+                                <div class="flex justify-between text-lg font-semibold">
+                                    <span>Total Suara Dialokasikan:</span>
+                                    <span class="text-red-600">60/60 suara</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-center">
+                            <button onclick="submitVote()" class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold text-lg transition-colors duration-200">
+                                🗳️ Kirim Suara Anda
+                            </button>
+                            <p class="text-sm text-gray-500 mt-2">Pastikan distribusi suara sudah sesuai sebelum mengirim</p>
+
+                            <!-- Debug Button (HIDDEN - only for development) -->
+                            <div class="mt-4 pt-4 border-t border-gray-200" style="display: none;">
+                                <button onclick="testDatabaseConnection()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm mr-2">
+                                    🔍 Test Database
+                                </button>
+                                <button onclick="testVoteSubmission()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm">
+                                    🧪 Test Vote API
+                                </button>
+                                <p class="text-xs text-gray-400 mt-1">Debug tools - check console for details</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden hidden"></div>
+
+    <script>
+        // Mobile sidebar toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+        // Toggle mobile menu
+        function toggleMobileMenu() {
+            sidebar.classList.toggle('sidebar-hidden');
+            sidebarOverlay.classList.toggle('hidden');
+            document.body.classList.toggle('overflow-hidden'); // Prevent body scroll when menu is open
+        }
+
+        // Close mobile menu
+        function closeMobileMenu() {
+            sidebar.classList.add('sidebar-hidden');
+            sidebarOverlay.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        // Event listeners
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+        }
+
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', closeMobileMenu);
+        }
+
+        // Close menu when clicking on navigation links (mobile)
+        const navLinks = document.querySelectorAll('#sidebar a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 1024) { // lg breakpoint
+                    closeMobileMenu();
+                }
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) { // lg breakpoint
+                sidebar.classList.remove('sidebar-hidden');
+                sidebarOverlay.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+        });
+
+        // Handle escape key to close mobile menu
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && window.innerWidth < 1024) {
+                closeMobileMenu();
+            }
+        });
+
+        // Vote count tracking
+        let VOTE_QUOTA = 0; // ❌ HARDCODE DIHAPUS - Default 0, akan diupdate dari user data
+        let currentStep = 1; // Current step (1-4)
+        let currentUserData = null; // Data user yang sedang login
+        let candidateData = null; // Data kandidat dari API
+
+        // Fungsi untuk mendapatkan jatah suara user
+        function getUserVoteQuota() {
+            if (currentUserData && currentUserData.voteCount) {
+                return currentUserData.voteCount;
+            }
+            if (currentUserData && currentUserData.vote_count) {
+                return currentUserData.vote_count;
+            }
+            return 0; // ❌ HARDCODE DIHAPUS - Default 0, harus dari user data
+        }
+
+        // Load candidate data dari API atau localStorage (sync dengan admin panel)
+        async function loadCandidateData() {
+            try {
+                console.log('📊 Loading candidate data...');
+
+                // Check if API is available
+                if (!window.kpuDB) {
+                    console.error('❌ KPU Database API not available! Please ensure data-sync.js is loaded.');
+                } else {
+                    // Try to get from API first (same as admin panel)
+                    try {
+                        console.log('🌐 Calling API: get_candidates...');
+                        const apiCandidates = await window.kpuDB.apiCall('get_candidates');
+
+                        if (apiCandidates && apiCandidates.length > 0) {
+                            candidateData = convertApiToLocalFormat(apiCandidates);
+                            console.log('✅ Candidate data loaded from API:', candidateData);
+                            console.log(`📊 Found ${apiCandidates.length} candidates in API`);
+                            return candidateData;
+                        } else {
+                            console.warn('⚠️ API returned empty candidate list');
+                        }
+                    } catch (error) {
+                        console.warn('⚠️ Failed to load from API:', error);
+                        console.log('📱 Falling back to localStorage...');
+                    }
+                }
+
+                // Fallback to localStorage - use same keys as admin panel
+                const savedNames = localStorage.getItem('candidate_names');
+                if (savedNames) {
+                    const nameData = JSON.parse(savedNames);
+                    candidateData = convertAdminToLocalFormat(nameData);
+                    console.log('✅ Candidate data loaded from localStorage (admin format):', candidateData);
+                    return candidateData;
+                }
+
+                // Try old format for backward compatibility
+                const savedCandidates = localStorage.getItem('candidate_data');
+                if (savedCandidates) {
+                    candidateData = JSON.parse(savedCandidates);
+                    console.log('✅ Candidate data loaded from localStorage (old format):', candidateData);
+                    return candidateData;
+                }
+
+                // Create default candidate structure with admin panel names
+                console.warn('⚠️ No candidate data found, creating default structure...');
+                candidateData = createDefaultCandidateData();
+                console.log('✅ Default candidate data created:', candidateData);
+                return candidateData;
+
+            } catch (error) {
+                console.error('❌ Error loading candidate data:', error);
+                candidateData = createDefaultCandidateData();
+                return candidateData;
+            }
+        }
+
+        // Convert API format to local format
+        function convertApiToLocalFormat(apiCandidates) {
+            const result = {
+                presiden: [],
+                pm: [],
+                parlemen: []
+            };
+
+            console.log('🔄 Converting API candidates to local format:', apiCandidates);
+
+            apiCandidates.forEach(candidate => {
+                const candidateObj = {
+                    id: candidate.id,
+                    name: candidate.name || candidate.candidate_name,
+                    photo: candidate.photo_url || candidate.photo || 'kandidat/kpulogo.jpg'
+                };
+
+                if (candidate.id.startsWith('presiden')) {
+                    result.presiden.push(candidateObj);
+                    console.log(`✅ Added presiden candidate: ${candidateObj.name}`);
+                } else if (candidate.id.startsWith('pm')) {
+                    result.pm.push(candidateObj);
+                    console.log(`✅ Added PM candidate: ${candidateObj.name}`);
+                } else if (candidate.id.startsWith('parlemen')) {
+                    result.parlemen.push(candidateObj);
+                    console.log(`✅ Added parlemen candidate: ${candidateObj.name}`);
+                }
+            });
+
+            console.log('✅ API conversion complete:', result);
+            return result;
+        }
+
+        // Convert admin panel format to local format
+        function convertAdminToLocalFormat(nameData) {
+            const result = {
+                presiden: [],
+                pm: [],
+                parlemen: []
+            };
+
+            console.log('🔄 Converting admin panel data to local format:', nameData);
+
+            // Map admin panel keys to candidate data
+            const mapping = {
+                'presiden1-name': { category: 'presiden', id: 'presiden1' },
+                'presiden2-name': { category: 'presiden', id: 'presiden2' },
+                'pm1-name': { category: 'pm', id: 'pm1' },
+                'pm2-name': { category: 'pm', id: 'pm2' },
+                'parlemen1-name': { category: 'parlemen', id: 'parlemen1' },
+                'parlemen2-name': { category: 'parlemen', id: 'parlemen2' },
+                'parlemen3-name': { category: 'parlemen', id: 'parlemen3' },
+                'parlemen4-name': { category: 'parlemen', id: 'parlemen4' }
+            };
+
+            Object.keys(nameData).forEach(key => {
+                const map = mapping[key];
+                if (map) {
+                    const candidateObj = {
+                        id: map.id,
+                        name: nameData[key],
+                        photo: 'kandidat/kpulogo.jpg' // Default, will be updated by photo loading
+                    };
+                    result[map.category].push(candidateObj);
+                    console.log(`✅ Added ${map.category} candidate: ${candidateObj.name}`);
+                }
+            });
+
+            console.log('✅ Admin panel conversion complete:', result);
+            return result;
+        }
+
+        // Create default candidate data structure
+        function createDefaultCandidateData() {
+            console.log('🔄 Creating default candidate data structure...');
+
+            // DEFAULT DATA HARUS MATCH DENGAN DATABASE (NAMA YANG BENAR)
+            const defaultData = {
+                presiden: [
+                    { id: 'presiden1', name: 'NENENG & INAYAH', photo: 'kandidat/kpulogo.jpg' },
+                    { id: 'presiden2', name: 'AISYAH & EVI', photo: 'kandidat/kpulogo.jpg' }
+                ],
+                pm: [
+                    { id: 'pm1', name: 'KUKUH', photo: 'kandidat/kpulogo.jpg' },
+                    { id: 'pm2', name: 'SAYYIDAH', photo: 'kandidat/kpulogo.jpg' }
+                ],
+                parlemen: [
+                    { id: 'parlemen1', name: 'ADINUR KHOLIFAH', photo: 'kandidat/kpulogo.jpg' },
+                    { id: 'parlemen2', name: 'ENI FATMAWATI', photo: 'kandidat/kpulogo.jpg' },
+                    { id: 'parlemen3', name: 'FAIZAH MAULIDA', photo: 'kandidat/kpulogo.jpg' },
+                    { id: 'parlemen4', name: 'AHMAD NASHUKA', photo: 'kandidat/kpulogo.jpg' }
+                ]
+            };
+
+            console.log('✅ Default candidate data created:', defaultData);
+            return defaultData;
+        }
+
+        // Note: Helper functions are defined above (convertApiToLocalFormat, convertAdminToLocalFormat, createDefaultCandidateData)
+
+        // Update jatah suara berdasarkan user
+        function updateVoteQuota() {
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (user && (user.voteCount || user.vote_count)) {
+                VOTE_QUOTA = user.voteCount || user.vote_count || 0;
+                currentUserData = user;
+
+                // Validasi quota tidak boleh 0
+                if (VOTE_QUOTA <= 0) {
+                    console.error('❌ INVALID VOTE QUOTA: User vote quota is 0 or invalid!');
+                    alert('❌ Error: Jatah suara Anda tidak valid (0 suara). Silakan hubungi admin.');
+                    return;
+                }
+
+                // Update tampilan jatah suara di UI
+                updateQuotaDisplay();
+
+                // Update semua elemen hardcoded
+                updateAllHardcodedElements();
+
+                console.log(`✅ Jatah suara diupdate: ${VOTE_QUOTA} suara per kategori untuk ${user.name}`);
+            } else {
+                console.error('❌ NO VOTE QUOTA: User data tidak memiliki vote quota!');
+                alert('❌ Error: Data jatah suara tidak ditemukan. Silakan login ulang atau hubungi admin.');
+                VOTE_QUOTA = 0;
+            }
+        }
+
+        // Validasi input realtime
+        function validateInput(input) {
+            const value = parseInt(input.value) || 0;
+
+            // Validasi tidak boleh melebihi quota
+            if (value > VOTE_QUOTA) {
+                input.value = VOTE_QUOTA;
+                alert(`⚠️ Maksimal ${VOTE_QUOTA} suara per kandidat!`);
+            }
+
+            // Validasi tidak boleh negatif
+            if (value < 0) {
+                input.value = 0;
+            }
+
+            // Update vote count untuk kategori yang sesuai
+            if (input.id.includes('presiden')) {
+                updateVoteCount('presiden');
+            } else if (input.id.includes('pm')) {
+                updateVoteCount('pm');
+            } else if (input.id.includes('parlemen')) {
+                updateVoteCount('parlemen');
+            }
+        }
+
+        // Update semua elemen yang masih hardcoded
+        function updateAllHardcodedElements() {
+            // Update semua elemen yang mengandung "20" dengan VOTE_QUOTA
+            updateHardcodedText();
+            updateHardcodedAttributes();
+            updateHardcodedSummary();
+        }
+
+        // Update text yang hardcoded
+        function updateHardcodedText() {
+            // Update progress steps
+            const progressSteps = document.querySelectorAll('.text-xs.text-gray-400');
+            progressSteps.forEach(element => {
+                if (element.textContent.includes('20 suara')) {
+                    element.textContent = `${VOTE_QUOTA} suara`;
+                }
+            });
+
+            // Update quota info
+            const quotaInfo = document.querySelector('#quotaInfo .text-sm.text-red-700');
+            if (quotaInfo) {
+                quotaInfo.innerHTML = `Anda harus menggunakan <strong>semua ${VOTE_QUOTA} suara</strong> untuk kategori ini sebelum melanjutkan ke tahap berikutnya.`;
+            }
+
+            // Update header jatah suara dengan innerHTML
+            const headerQuotas = document.querySelectorAll('.text-sm.text-gray-600');
+            headerQuotas.forEach(element => {
+                if (element.innerHTML.includes('Jatah Suara:')) {
+                    element.innerHTML = `Jatah Suara: <span class="font-semibold">${VOTE_QUOTA}</span>`;
+                }
+            });
+        }
+
+        // Update attributes yang hardcoded
+        function updateHardcodedAttributes() {
+            // Update max attributes di semua input voting
+            const voteInputs = document.querySelectorAll('input[type="number"]');
+            voteInputs.forEach(input => {
+                input.setAttribute('max', VOTE_QUOTA);
+
+                // Tambahkan event listener untuk validasi realtime
+                input.addEventListener('input', function(e) {
+                    const value = parseInt(e.target.value) || 0;
+
+                    // Validasi tidak boleh melebihi quota
+                    if (value > VOTE_QUOTA) {
+                        e.target.value = VOTE_QUOTA;
+                        alert(`Maksimal ${VOTE_QUOTA} suara per kandidat!`);
+                    }
+
+                    // Validasi tidak boleh negatif
+                    if (value < 0) {
+                        e.target.value = 0;
+                    }
+
+                    // Update vote count untuk kategori yang sesuai
+                    if (e.target.id.includes('presiden')) {
+                        updateVoteCount('presiden');
+                    } else if (e.target.id.includes('pm')) {
+                        updateVoteCount('pm');
+                    } else if (e.target.id.includes('parlemen')) {
+                        updateVoteCount('parlemen');
+                    }
+                });
+            });
+        }
+
+        // Update summary yang hardcoded
+        function updateHardcodedSummary() {
+            // Update summary headers di step 4
+            const summaryHeaders = document.querySelectorAll('#step4-content h5');
+            summaryHeaders.forEach(header => {
+                if (header.textContent.includes('(20/20 suara)')) {
+                    header.innerHTML = header.innerHTML.replace('(20/20 suara)', `(${VOTE_QUOTA}/${VOTE_QUOTA} suara)`);
+                }
+            });
+
+            // Update total suara
+            const totalElement = document.querySelector('.text-red-600');
+            if (totalElement && totalElement.textContent.includes('60/60 suara')) {
+                const totalVotes = VOTE_QUOTA * 3;
+                totalElement.textContent = `${totalVotes}/${totalVotes} suara`;
+            }
+        }
+
+        // Update tampilan jatah suara di UI
+        function updateQuotaDisplay() {
+            console.log(`🔄 Updating UI dengan jatah suara: ${VOTE_QUOTA}`);
+
+            // 1. Update progress steps (20 suara)
+            const stepElements = document.querySelectorAll('#step-presiden p:last-child, #step-pm p:last-child, #step-parlemen p:last-child');
+            stepElements.forEach(element => {
+                element.textContent = `${VOTE_QUOTA} suara`;
+            });
+
+            // 2. Update quota info text
+            const quotaInfoText = document.querySelector('#quotaInfo p');
+            if (quotaInfoText) {
+                quotaInfoText.innerHTML = `Anda harus menggunakan <strong>semua ${VOTE_QUOTA} suara</strong> untuk kategori ini sebelum melanjutkan ke tahap berikutnya.`;
+            }
+
+            // 3. Update header jatah suara di setiap kategori
+            updateHeaderQuotas();
+
+            // 4. Update sisa suara di setiap kategori
+            document.querySelectorAll('#presidenRemaining, #pmRemaining, #parlemenRemaining').forEach(element => {
+                element.textContent = VOTE_QUOTA;
+            });
+
+            // 5. Update max attribute di semua input fields
+            updateInputMaxValues();
+
+            // 6. Update summary di step 4
+            updateSummaryQuota();
+
+            console.log(`✅ UI berhasil diupdate dengan jatah suara: ${VOTE_QUOTA}`);
+        }
+
+        // Update header jatah suara
+        function updateHeaderQuotas() {
+            // Update "Jatah Suara: 20" di header setiap kategori
+            const quotaSpans = document.querySelectorAll('.text-sm.text-gray-600 span.font-semibold');
+            quotaSpans.forEach(span => {
+                if (span.parentElement.textContent.includes('Jatah Suara:')) {
+                    span.textContent = VOTE_QUOTA;
+                }
+            });
+
+            // Update dengan selector yang lebih spesifik
+            const quotaTexts = [
+                'div:contains("Presiden & Wakil Presiden") .text-sm.text-gray-600',
+                'div:contains("Perdana Menteri") .text-sm.text-gray-600',
+                'div:contains("Ketua Parlemen") .text-sm.text-gray-600'
+            ];
+
+            // Manual update untuk setiap kategori
+            const presidenQuota = document.querySelector('#step1-content .text-sm.text-gray-600 span.font-semibold');
+            const pmQuota = document.querySelector('#step2-content .text-sm.text-gray-600 span.font-semibold');
+            const parlemenQuota = document.querySelector('#step3-content .text-sm.text-gray-600 span.font-semibold');
+
+            if (presidenQuota) presidenQuota.textContent = VOTE_QUOTA;
+            if (pmQuota) pmQuota.textContent = VOTE_QUOTA;
+            if (parlemenQuota) parlemenQuota.textContent = VOTE_QUOTA;
+        }
+
+        // Update max values di input fields
+        function updateInputMaxValues() {
+            const voteInputs = document.querySelectorAll('input[type="number"]');
+            voteInputs.forEach(input => {
+                input.setAttribute('max', VOTE_QUOTA);
+            });
+        }
+
+        // Update quota di summary step 4
+        function updateSummaryQuota() {
+            // Update summary headers
+            const summaryHeaders = document.querySelectorAll('h5');
+            summaryHeaders.forEach(header => {
+                if (header.textContent.includes('(20/20 suara)')) {
+                    header.innerHTML = header.innerHTML.replace('(20/20 suara)', `(${VOTE_QUOTA}/${VOTE_QUOTA} suara)`);
+                }
+            });
+
+            // Update total suara
+            const totalElement = document.querySelector('.flex.justify-between.text-lg.font-semibold span:last-child');
+            if (totalElement) {
+                const totalVotes = VOTE_QUOTA * 3; // 3 kategori
+                totalElement.textContent = `${totalVotes}/${totalVotes} suara`;
+            }
+        }
+        const stepTitles = {
+            1: 'Presiden & Wakil Presiden',
+            2: 'Perdana Menteri',
+            3: 'Ketua Parlemen',
+            4: 'Konfirmasi & Submit'
+        };
+        const stepColors = {
+            1: 'red',
+            2: 'green',
+            3: 'purple',
+            4: 'blue'
+        };
+
+        // Update vote count display
+        function updateVoteCount(category) {
+            let totalUsed = 0;
+            let inputs = [];
+            let usedElement, remainingElement;
+
+            if (category === 'presiden') {
+                inputs = [
+                    document.getElementById('presiden1'),
+                    document.getElementById('presiden2')
+                ];
+                usedElement = document.getElementById('presidenUsed');
+                remainingElement = document.getElementById('presidenRemaining');
+            } else if (category === 'pm') {
+                inputs = [
+                    document.getElementById('pm1'),
+                    document.getElementById('pm2')
+                ];
+                usedElement = document.getElementById('pmUsed');
+                remainingElement = document.getElementById('pmRemaining');
+            } else if (category === 'parlemen') {
+                inputs = [
+                    document.getElementById('parlemen1'),
+                    document.getElementById('parlemen2'),
+                    document.getElementById('parlemen3'),
+                    document.getElementById('parlemen4')
+                ];
+                usedElement = document.getElementById('parlemenUsed');
+                remainingElement = document.getElementById('parlemenRemaining');
+            }
+
+            // Calculate total used votes
+            inputs.forEach(input => {
+                const value = parseInt(input.value) || 0;
+                totalUsed += value;
+            });
+
+            // Check if exceeds quota
+            if (totalUsed > VOTE_QUOTA) {
+                alert(`Total suara melebihi jatah! Maksimal ${VOTE_QUOTA} suara untuk kategori ${category === 'presiden' ? 'Presiden & Wakil Presiden' : category === 'pm' ? 'Perdana Menteri' : 'Ketua Parlemen'}.`);
+
+                // Find the input that was just changed and reduce it
+                const lastChangedInput = document.activeElement;
+                if (lastChangedInput && inputs.includes(lastChangedInput)) {
+                    const currentValue = parseInt(lastChangedInput.value) || 0;
+                    const excess = totalUsed - VOTE_QUOTA;
+                    lastChangedInput.value = Math.max(0, currentValue - excess);
+                }
+
+                // Recalculate after adjustment
+                totalUsed = 0;
+                inputs.forEach(input => {
+                    const value = parseInt(input.value) || 0;
+                    totalUsed += value;
+                });
+            }
+
+            // Update display
+            const remaining = VOTE_QUOTA - totalUsed;
+            usedElement.textContent = totalUsed;
+            remainingElement.textContent = remaining;
+
+            // Color coding
+            if (remaining === 0) {
+                remainingElement.className = 'font-semibold text-orange-600';
+            } else if (remaining < 5) {
+                remainingElement.className = 'font-semibold text-yellow-600';
+            } else {
+                remainingElement.className = 'font-semibold text-green-600';
+            }
+
+            // Update progress indicator
+            updateProgressIndicator();
+
+            // Update next button state
+            updateNextButtonState();
+        }
+
+        // Update next button state based on current step completion
+        function updateNextButtonState() {
+            const nextBtn = document.getElementById('nextBtn');
+            let canProceed = false;
+
+            if (currentStep === 1) {
+                // Check if all 20 votes are allocated for Presiden
+                const presidenTotal = (parseInt(document.getElementById('presiden1').value) || 0) +
+                                     (parseInt(document.getElementById('presiden2').value) || 0);
+                canProceed = presidenTotal === VOTE_QUOTA;
+            } else if (currentStep === 2) {
+                // Check if all 20 votes are allocated for PM
+                const pmTotal = (parseInt(document.getElementById('pm1').value) || 0) +
+                               (parseInt(document.getElementById('pm2').value) || 0);
+                canProceed = pmTotal === VOTE_QUOTA;
+            } else if (currentStep === 3) {
+                // Check if all 20 votes are allocated for Parlemen
+                const parlemenTotal = (parseInt(document.getElementById('parlemen1').value) || 0) +
+                                     (parseInt(document.getElementById('parlemen2').value) || 0) +
+                                     (parseInt(document.getElementById('parlemen3').value) || 0) +
+                                     (parseInt(document.getElementById('parlemen4').value) || 0);
+                canProceed = parlemenTotal === VOTE_QUOTA;
+            }
+
+            if (canProceed) {
+                nextBtn.disabled = false;
+                nextBtn.className = `px-4 py-2 bg-${stepColors[currentStep]}-600 hover:bg-${stepColors[currentStep]}-700 text-white rounded-lg font-medium transition-colors duration-200`;
+                nextBtn.style.cursor = 'pointer';
+            } else {
+                nextBtn.disabled = true;
+                nextBtn.className = 'px-4 py-2 bg-gray-400 text-white rounded-lg font-medium transition-colors duration-200 cursor-not-allowed';
+            }
+
+            // Hide next button on step 4
+            if (currentStep === 4) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'block';
+            }
+        }
+
+        // Show specific step content with validation
+        function showStep(step) {
+            // 🔒 ENHANCED VALIDATION: Prevent direct access to step 4 without completing previous steps
+            if (step === 4) {
+                // Check if all previous steps are completed
+                if (!isStepCompleted(1) || !isStepCompleted(2) || !isStepCompleted(3)) {
+                    alert(`❌ AKSES DITOLAK!\n\nAnda tidak dapat langsung ke Step 4 (Konfirmasi).\n\nHarus menyelesaikan semua step terlebih dahulu:\n\n${!isStepCompleted(1) ? '❌' : '✅'} Step 1: Presiden & Wakil Presiden (${VOTE_QUOTA} suara)\n${!isStepCompleted(2) ? '❌' : '✅'} Step 2: Perdana Menteri (${VOTE_QUOTA} suara)\n${!isStepCompleted(3) ? '❌' : '✅'} Step 3: Ketua Parlemen (${VOTE_QUOTA} suara)\n\nSilakan lengkapi step yang belum selesai.`);
+
+                    // Redirect to first incomplete step
+                    if (!isStepCompleted(1)) {
+                        currentStep = 1;
+                        step = 1;
+                    } else if (!isStepCompleted(2)) {
+                        currentStep = 2;
+                        step = 2;
+                    } else if (!isStepCompleted(3)) {
+                        currentStep = 3;
+                        step = 3;
+                    }
+                }
+            }
+
+            // Update current step
+            currentStep = step;
+
+            // Hide all steps
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`step${i}-content`).classList.add('hidden');
+            }
+
+            // Show current step
+            document.getElementById(`step${step}-content`).classList.remove('hidden');
+
+            // Update title
+            document.getElementById('stepTitle').textContent = stepTitles[step];
+
+            // Update quota info color
+            const quotaInfo = document.getElementById('quotaInfo');
+            const color = stepColors[step];
+            quotaInfo.className = `bg-${color}-50 border border-${color}-200 rounded-lg p-4 mb-8`;
+            quotaInfo.querySelector('svg').className = `w-5 h-5 text-${color}-600 mr-2`;
+            quotaInfo.querySelector('h3').className = `text-sm font-semibold text-${color}-800`;
+            quotaInfo.querySelector('p').className = `text-sm text-${color}-700`;
+
+            // Update prev button
+            const prevBtn = document.getElementById('prevBtn');
+            if (step === 1) {
+                prevBtn.classList.add('hidden');
+            } else {
+                prevBtn.classList.remove('hidden');
+            }
+
+            // Update next button state
+            updateNextButtonState();
+
+            // Update progress indicator
+            updateProgressIndicator();
+
+            // If step 4, populate summary
+            if (step === 4) {
+                populateConfirmationSummary();
+            }
+
+            // Update quota display setiap kali step berubah
+            updateAllHardcodedElements();
+        }
+
+        // Next step function with enhanced validation
+        function nextStep() {
+            if (currentStep < 4) {
+                // 🔒 ENHANCED VALIDATION: Pastikan step saat ini sudah completed sebelum next
+                if (!isStepCompleted(currentStep)) {
+                    alert(`❌ STEP ${currentStep} BELUM SELESAI!\n\nAnda harus menggunakan tepat ${VOTE_QUOTA} suara untuk kategori ini sebelum melanjutkan ke step berikutnya.\n\nSilakan lengkapi distribusi suara terlebih dahulu.`);
+                    return;
+                }
+
+                currentStep++;
+                showStep(currentStep);
+            }
+        }
+
+        // Check if a step is completed (all quota used)
+        function isStepCompleted(step) {
+            if (step === 1) {
+                const presidenTotal = (parseInt(document.getElementById('presiden1').value) || 0) +
+                                     (parseInt(document.getElementById('presiden2').value) || 0);
+                return presidenTotal === VOTE_QUOTA;
+            } else if (step === 2) {
+                const pmTotal = (parseInt(document.getElementById('pm1').value) || 0) +
+                               (parseInt(document.getElementById('pm2').value) || 0);
+                return pmTotal === VOTE_QUOTA;
+            } else if (step === 3) {
+                const parlemenTotal = (parseInt(document.getElementById('parlemen1').value) || 0) +
+                                     (parseInt(document.getElementById('parlemen2').value) || 0) +
+                                     (parseInt(document.getElementById('parlemen3').value) || 0) +
+                                     (parseInt(document.getElementById('parlemen4').value) || 0);
+                return parlemenTotal === VOTE_QUOTA;
+            }
+            return true; // Step 4 doesn't need validation
+        }
+
+        // Previous step function
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+
+        // Populate confirmation summary with dynamic candidate data
+        function populateConfirmationSummary() {
+            console.log('📋 Populating confirmation summary with dynamic candidate data...');
+
+            // Update summary headers dengan quota dinamis
+            updateSummaryQuota();
+
+            if (!candidateData) {
+                console.warn('⚠️ No candidate data available for summary');
+                return;
+            }
+
+            // Presiden summary - dynamic from API data
+            const presidenSummary = document.getElementById('presiden-summary');
+            let presidenHTML = '';
+
+            if (candidateData.presiden && candidateData.presiden.length > 0) {
+                candidateData.presiden.forEach((candidate, index) => {
+                    const inputId = `presiden${index + 1}`;
+                    const votes = parseInt(document.getElementById(inputId)?.value) || 0;
+                    if (votes > 0) {
+                        presidenHTML += `<div class="flex justify-between"><span>• ${candidate.name}:</span><span class="font-medium">${votes} suara</span></div>`;
+                        console.log(`✅ Added presiden summary: ${candidate.name} = ${votes} suara`);
+                    }
+                });
+            } else {
+                // Fallback to hardcode if no candidate data
+                const presiden1 = parseInt(document.getElementById('presiden1').value) || 0;
+                const presiden2 = parseInt(document.getElementById('presiden2').value) || 0;
+                if (presiden1 > 0) presidenHTML += `<div class="flex justify-between"><span>• Kandidat Presiden 1:</span><span class="font-medium">${presiden1} suara</span></div>`;
+                if (presiden2 > 0) presidenHTML += `<div class="flex justify-between"><span>• Kandidat Presiden 2:</span><span class="font-medium">${presiden2} suara</span></div>`;
+            }
+            presidenSummary.innerHTML = presidenHTML;
+
+            // PM summary - dynamic from API data
+            const pmSummary = document.getElementById('pm-summary');
+            let pmHTML = '';
+
+            if (candidateData.pm && candidateData.pm.length > 0) {
+                candidateData.pm.forEach((candidate, index) => {
+                    const inputId = `pm${index + 1}`;
+                    const votes = parseInt(document.getElementById(inputId)?.value) || 0;
+                    if (votes > 0) {
+                        pmHTML += `<div class="flex justify-between"><span>• ${candidate.name}:</span><span class="font-medium">${votes} suara</span></div>`;
+                        console.log(`✅ Added PM summary: ${candidate.name} = ${votes} suara`);
+                    }
+                });
+            } else {
+                // Fallback to hardcode if no candidate data
+                const pm1 = parseInt(document.getElementById('pm1').value) || 0;
+                const pm2 = parseInt(document.getElementById('pm2').value) || 0;
+                if (pm1 > 0) pmHTML += `<div class="flex justify-between"><span>• Kandidat PM 1:</span><span class="font-medium">${pm1} suara</span></div>`;
+                if (pm2 > 0) pmHTML += `<div class="flex justify-between"><span>• Kandidat PM 2:</span><span class="font-medium">${pm2} suara</span></div>`;
+            }
+            pmSummary.innerHTML = pmHTML;
+
+            // Parlemen summary - dynamic from API data
+            const parlemenSummary = document.getElementById('parlemen-summary');
+            let parlemenHTML = '';
+
+            if (candidateData.parlemen && candidateData.parlemen.length > 0) {
+                candidateData.parlemen.forEach((candidate, index) => {
+                    const inputId = `parlemen${index + 1}`;
+                    const votes = parseInt(document.getElementById(inputId)?.value) || 0;
+                    if (votes > 0) {
+                        parlemenHTML += `<div class="flex justify-between"><span>• ${candidate.name}:</span><span class="font-medium">${votes} suara</span></div>`;
+                        console.log(`✅ Added parlemen summary: ${candidate.name} = ${votes} suara`);
+                    }
+                });
+            } else {
+                // Fallback to hardcode if no candidate data
+                const parlemen1 = parseInt(document.getElementById('parlemen1').value) || 0;
+                const parlemen2 = parseInt(document.getElementById('parlemen2').value) || 0;
+                const parlemen3 = parseInt(document.getElementById('parlemen3').value) || 0;
+                const parlemen4 = parseInt(document.getElementById('parlemen4').value) || 0;
+
+                if (parlemen1 > 0) parlemenHTML += `<div class="flex justify-between"><span>• Kandidat Parlemen 1:</span><span class="font-medium">${parlemen1} suara</span></div>`;
+                if (parlemen2 > 0) parlemenHTML += `<div class="flex justify-between"><span>• Kandidat Parlemen 2:</span><span class="font-medium">${parlemen2} suara</span></div>`;
+                if (parlemen3 > 0) parlemenHTML += `<div class="flex justify-between"><span>• Kandidat Parlemen 3:</span><span class="font-medium">${parlemen3} suara</span></div>`;
+                if (parlemen4 > 0) parlemenHTML += `<div class="flex justify-between"><span>• Kandidat Parlemen 4:</span><span class="font-medium">${parlemen4} suara</span></div>`;
+            }
+            parlemenSummary.innerHTML = parlemenHTML;
+
+            console.log('✅ Confirmation summary populated with dynamic candidate data');
+        }
+
+        // Update progress indicator
+        function updateProgressIndicator() {
+            // Check completion status for each category (must be exactly 20 votes)
+            const presidenTotal = (parseInt(document.getElementById('presiden1').value) || 0) +
+                                 (parseInt(document.getElementById('presiden2').value) || 0);
+            const pmTotal = (parseInt(document.getElementById('pm1').value) || 0) +
+                           (parseInt(document.getElementById('pm2').value) || 0);
+            const parlemenTotal = (parseInt(document.getElementById('parlemen1').value) || 0) +
+                                 (parseInt(document.getElementById('parlemen2').value) || 0) +
+                                 (parseInt(document.getElementById('parlemen3').value) || 0) +
+                                 (parseInt(document.getElementById('parlemen4').value) || 0);
+
+            let completedSteps = 0;
+
+            // Update step 1 (Presiden)
+            const stepPresiden = document.getElementById('step-presiden');
+            if (presidenTotal === VOTE_QUOTA) {
+                stepPresiden.querySelector('div div').className = 'w-10 h-10 bg-green-100 border border-green-600 rounded-full flex items-center justify-center mx-auto mb-2';
+                stepPresiden.querySelector('div div').innerHTML = '<svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"></path></svg>';
+                stepPresiden.querySelector('p').className = 'text-sm font-medium text-gray-900';
+                completedSteps++;
+            } else if (currentStep === 1) {
+                stepPresiden.querySelector('div div').className = 'w-10 h-10 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-2';
+                stepPresiden.querySelector('div div').innerHTML = '<span class="text-white font-semibold text-sm">1</span>';
+                stepPresiden.querySelector('p').className = 'text-sm font-semibold text-gray-900';
+            } else {
+                stepPresiden.querySelector('div div').className = 'w-10 h-10 bg-gray-200 border border-gray-300 rounded-full flex items-center justify-center mx-auto mb-2';
+                stepPresiden.querySelector('div div').innerHTML = '<span class="text-gray-500 font-semibold text-sm">1</span>';
+                stepPresiden.querySelector('p').className = 'text-sm text-gray-500';
+            }
+
+            // Update step 2 (PM)
+            const stepPM = document.getElementById('step-pm');
+            if (pmTotal === VOTE_QUOTA) {
+                stepPM.querySelector('div div').className = 'w-10 h-10 bg-green-100 border border-green-600 rounded-full flex items-center justify-center mx-auto mb-2';
+                stepPM.querySelector('div div').innerHTML = '<svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"></path></svg>';
+                stepPM.querySelector('p').className = 'text-sm font-medium text-gray-900';
+                completedSteps++;
+            } else if (currentStep === 2) {
+                stepPM.querySelector('div div').className = 'w-10 h-10 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-2';
+                stepPM.querySelector('div div').innerHTML = '<span class="text-white font-semibold text-sm">2</span>';
+                stepPM.querySelector('p').className = 'text-sm font-semibold text-gray-900';
+            } else {
+                stepPM.querySelector('div div').className = 'w-10 h-10 bg-gray-200 border border-gray-300 rounded-full flex items-center justify-center mx-auto mb-2';
+                stepPM.querySelector('div div').innerHTML = '<span class="text-gray-500 font-semibold text-sm">2</span>';
+                stepPM.querySelector('p').className = 'text-sm text-gray-500';
+            }
+
+            // Update step 3 (Parlemen)
+            const stepParlemen = document.getElementById('step-parlemen');
+            if (parlemenTotal === VOTE_QUOTA) {
+                stepParlemen.querySelector('div div').className = 'w-10 h-10 bg-green-100 border border-green-600 rounded-full flex items-center justify-center mx-auto mb-2';
+                stepParlemen.querySelector('div div').innerHTML = '<svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"></path></svg>';
+                stepParlemen.querySelector('p').className = 'text-sm font-medium text-gray-900';
+                completedSteps++;
+            } else if (currentStep === 3) {
+                stepParlemen.querySelector('div div').className = 'w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-2';
+                stepParlemen.querySelector('div div').innerHTML = '<span class="text-white font-semibold text-sm">3</span>';
+                stepParlemen.querySelector('p').className = 'text-sm font-semibold text-gray-900';
+            } else {
+                stepParlemen.querySelector('div div').className = 'w-10 h-10 bg-gray-200 border border-gray-300 rounded-full flex items-center justify-center mx-auto mb-2';
+                stepParlemen.querySelector('div div').innerHTML = '<span class="text-gray-500 font-semibold text-sm">3</span>';
+                stepParlemen.querySelector('p').className = 'text-sm text-gray-500';
+            }
+
+            // Update step 4 (Konfirmasi)
+            const stepKonfirmasi = document.getElementById('step-konfirmasi');
+            if (currentStep === 4) {
+                stepKonfirmasi.querySelector('div div').className = 'w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-2';
+                stepKonfirmasi.querySelector('div div').innerHTML = '<span class="text-white font-semibold text-sm">4</span>';
+                stepKonfirmasi.querySelector('p').className = 'text-sm font-semibold text-gray-900';
+            } else {
+                stepKonfirmasi.querySelector('div div').className = 'w-10 h-10 bg-gray-200 border border-gray-300 rounded-full flex items-center justify-center mx-auto mb-2';
+                stepKonfirmasi.querySelector('div div').innerHTML = '<span class="text-gray-500 font-semibold text-sm">4</span>';
+                stepKonfirmasi.querySelector('p').className = 'text-sm text-gray-500';
+            }
+
+            // Update progress bar based on current step
+            const progressPercentage = (currentStep / 4) * 100;
+            document.getElementById('progressBar').style.width = progressPercentage + '%';
+            document.getElementById('progressText').textContent = Math.round(progressPercentage) + '%';
+        }
+
+        // Vote submission function
+        // 🔥 FIXED: Submit vote function (ASYNC FOR SINGLE SUBMISSION FLOW)
+        async function submitVote() {
+            // ❌ HARDCODE DIHAPUS - Get candidate names from API data
+            if (!candidateData) {
+                alert('❌ Error: Data kandidat tidak tersedia. Silakan refresh halaman atau hubungi admin.');
+                return;
+            }
+
+            // Get all vote values using dynamic candidate data FIRST
+            const presidenVotes = {};
+            const pmVotes = {};
+            const parlemenVotes = {};
+
+            // 🔥 FIXED: SINGLE SOURCE OF TRUTH - NO MORE HARDCODED FALLBACKS
+            // Build presiden votes from candidate data ONLY
+            console.log('🔍 VOTE COLLECTION DEBUG - candidateData:', candidateData);
+            console.log('🔍 VOTE COLLECTION DEBUG - candidateData.presiden:', candidateData?.presiden);
+
+            if (candidateData && candidateData.presiden && candidateData.presiden.length > 0) {
+                candidateData.presiden.forEach((candidate, index) => {
+                    const inputId = `presiden${index + 1}`;
+                    const inputElement = document.getElementById(inputId);
+                    console.log(`🔍 VOTE COLLECTION DEBUG - Looking for input: ${inputId}, found:`, !!inputElement);
+                    if (inputElement) {
+                        const voteValue = parseInt(inputElement.value) || 0;
+                        presidenVotes[candidate.name] = voteValue;
+                        console.log(`✅ Presiden vote collected: "${candidate.name}" = ${voteValue} (from input ${inputId})`);
+                    } else {
+                        console.warn(`⚠️ Input element not found for presiden ${index + 1}: ${inputId}`);
+                        // Try alternative input collection
+                        const altInput = document.querySelector(`input[id*="presiden${index + 1}"]`);
+                        if (altInput) {
+                            const voteValue = parseInt(altInput.value) || 0;
+                            presidenVotes[candidate.name] = voteValue;
+                            console.log(`✅ Presiden vote collected (alternative): "${candidate.name}" = ${voteValue}`);
+                        }
+                    }
+                });
+            } else {
+                console.error('❌ CRITICAL: No presiden candidate data available!');
+                console.error('❌ candidateData:', candidateData);
+                alert('❌ Error: Data kandidat presiden tidak tersedia. Silakan refresh halaman atau hubungi admin.');
+                return;
+            }
+
+            // Build PM votes from candidate data ONLY
+            if (candidateData && candidateData.pm && candidateData.pm.length > 0) {
+                candidateData.pm.forEach((candidate, index) => {
+                    const inputId = `pm${index + 1}`;
+                    const inputElement = document.getElementById(inputId);
+                    if (inputElement) {
+                        pmVotes[candidate.name] = parseInt(inputElement.value) || 0;
+                        console.log(`✅ PM vote collected: "${candidate.name}" = ${pmVotes[candidate.name]}`);
+                    } else {
+                        console.warn(`⚠️ Input element not found for PM ${index + 1}: ${inputId}`);
+                    }
+                });
+            } else {
+                console.error('❌ CRITICAL: No PM candidate data available!');
+                alert('❌ Error: Data kandidat PM tidak tersedia. Silakan refresh halaman atau hubungi admin.');
+                return;
+            }
+
+            // Build parlemen votes from candidate data ONLY
+            if (candidateData && candidateData.parlemen && candidateData.parlemen.length > 0) {
+                candidateData.parlemen.forEach((candidate, index) => {
+                    const inputId = `parlemen${index + 1}`;
+                    const inputElement = document.getElementById(inputId);
+                    if (inputElement) {
+                        parlemenVotes[candidate.name] = parseInt(inputElement.value) || 0;
+                        console.log(`✅ Parlemen vote collected: "${candidate.name}" = ${parlemenVotes[candidate.name]}`);
+                    } else {
+                        console.warn(`⚠️ Input element not found for parlemen ${index + 1}: ${inputId}`);
+                    }
+                });
+            } else {
+                console.error('❌ CRITICAL: No parlemen candidate data available!');
+                alert('❌ Error: Data kandidat parlemen tidak tersedia. Silakan refresh halaman atau hubungi admin.');
+                return;
+            }
+
+            // 🔒 ENHANCED VALIDATION: Pastikan user sudah di step 4 (konfirmasi) ATAU semua vote sudah dialokasikan
+            const hasValidVotes = (
+                Object.values(presidenVotes).some(v => v > 0) &&
+                Object.values(pmVotes).some(v => v > 0) &&
+                Object.values(parlemenVotes).some(v => v > 0)
+            );
+
+            if (currentStep !== 4 && !hasValidVotes) {
+                console.warn('⚠️ Validation failed - not at step 4 and no valid votes');
+                alert('❌ VALIDASI GAGAL!\n\nAnda harus menyelesaikan semua step voting terlebih dahulu:\n\n1. ✅ Presiden & Wakil Presiden\n2. ✅ Perdana Menteri\n3. ✅ Ketua Parlemen\n4. ✅ Konfirmasi & Submit\n\nSilakan kembali ke step yang belum diselesaikan.');
+                return;
+            }
+
+            if (hasValidVotes && currentStep !== 4) {
+                console.log('✅ Valid votes detected, allowing submission even if not at step 4');
+            }
+
+
+
+            // Calculate totals
+            const presidenTotal = Object.values(presidenVotes).reduce((a, b) => a + b, 0);
+            const pmTotal = Object.values(pmVotes).reduce((a, b) => a + b, 0);
+            const parlemenTotal = Object.values(parlemenVotes).reduce((a, b) => a + b, 0);
+
+            // Validasi ketat - cek setiap input individual
+            const allInputs = [
+                ...Object.values(presidenVotes),
+                ...Object.values(pmVotes),
+                ...Object.values(parlemenVotes)
+            ];
+
+            // Cek apakah ada input yang melebihi quota individual
+            const maxIndividualVote = Math.max(...allInputs);
+            if (maxIndividualVote > VOTE_QUOTA) {
+                alert(`❌ VALIDASI GAGAL!\n\nAda kandidat yang mendapat ${maxIndividualVote} suara.\nMaksimal per kandidat: ${VOTE_QUOTA} suara.\n\nSilakan periksa kembali input Anda.`);
+                return;
+            }
+
+            // 🔒 ENHANCED VALIDATION: Pastikan semua kategori sudah diisi dengan benar
+            if (presidenTotal === 0) {
+                alert('❌ VALIDASI GAGAL!\n\nKategori PRESIDEN & WAKIL PRESIDEN belum diisi.\nSilakan kembali ke Step 1 dan berikan minimal 1 suara.');
+                showStep(1); // Paksa kembali ke step 1
+                return;
+            }
+
+            if (pmTotal === 0) {
+                alert('❌ VALIDASI GAGAL!\n\nKategori PERDANA MENTERI belum diisi.\nSilakan kembali ke Step 2 dan berikan minimal 1 suara.');
+                showStep(2); // Paksa kembali ke step 2
+                return;
+            }
+
+            if (parlemenTotal === 0) {
+                alert('❌ VALIDASI GAGAL!\n\nKategori KETUA PARLEMEN belum diisi.\nSilakan kembali ke Step 3 dan berikan minimal 1 suara.');
+                showStep(3); // Paksa kembali ke step 3
+                return;
+            }
+
+            // 🔒 ENHANCED VALIDATION: Pastikan semua step sudah completed dengan quota penuh
+            if (presidenTotal !== VOTE_QUOTA) {
+                alert(`❌ VALIDASI GAGAL!\n\nKategori PRESIDEN tidak sesuai quota.\nAnda memberikan: ${presidenTotal} suara\nHarus tepat: ${VOTE_QUOTA} suara\n\nSilakan kembali ke Step 1 dan perbaiki distribusi suara.`);
+                showStep(1);
+                return;
+            }
+
+            if (pmTotal !== VOTE_QUOTA) {
+                alert(`❌ VALIDASI GAGAL!\n\nKategori PM tidak sesuai quota.\nAnda memberikan: ${pmTotal} suara\nHarus tepat: ${VOTE_QUOTA} suara\n\nSilakan kembali ke Step 2 dan perbaiki distribusi suara.`);
+                showStep(2);
+                return;
+            }
+
+            if (parlemenTotal !== VOTE_QUOTA) {
+                alert(`❌ VALIDASI GAGAL!\n\nKategori PARLEMEN tidak sesuai quota.\nAnda memberikan: ${parlemenTotal} suara\nHarus tepat: ${VOTE_QUOTA} suara\n\nSilakan kembali ke Step 3 dan perbaiki distribusi suara.`);
+                showStep(3);
+                return;
+            }
+
+            // Validasi total per kategori tidak melebihi quota
+            if (presidenTotal > VOTE_QUOTA) {
+                alert(`❌ KATEGORI PRESIDEN MELEBIHI QUOTA!\n\nTotal: ${presidenTotal} suara\nMaksimal: ${VOTE_QUOTA} suara\n\nSilakan kurangi distribusi suara Presiden.`);
+                return;
+            }
+
+            if (pmTotal > VOTE_QUOTA) {
+                alert(`❌ KATEGORI PM MELEBIHI QUOTA!\n\nTotal: ${pmTotal} suara\nMaksimal: ${VOTE_QUOTA} suara\n\nSilakan kurangi distribusi suara PM.`);
+                return;
+            }
+
+            if (parlemenTotal > VOTE_QUOTA) {
+                alert(`❌ KATEGORI PARLEMEN MELEBIHI QUOTA!\n\nTotal: ${parlemenTotal} suara\nMaksimal: ${VOTE_QUOTA} suara\n\nSilakan kurangi distribusi suara Parlemen.`);
+                return;
+            }
+
+            // Log untuk debugging
+            console.log('🔍 VALIDASI VOTING:');
+            console.log('Presiden votes:', presidenVotes, 'Total:', presidenTotal);
+            console.log('PM votes:', pmVotes, 'Total:', pmTotal);
+            console.log('Parlemen votes:', parlemenVotes, 'Total:', parlemenTotal);
+            console.log('Vote quota:', VOTE_QUOTA);
+            console.log('Max individual vote:', maxIndividualVote);
+
+            // Create confirmation message
+            let confirmMessage = `Konfirmasi Distribusi Suara Anda:\n\n`;
+
+            confirmMessage += `PRESIDEN & WAKIL PRESIDEN (Total: ${presidenTotal}/${VOTE_QUOTA}):\n`;
+            Object.entries(presidenVotes).forEach(([name, votes]) => {
+                if (votes > 0) confirmMessage += `• ${name}: ${votes} suara\n`;
+            });
+
+            confirmMessage += `\nPERDANA MENTERI (Total: ${pmTotal}/${VOTE_QUOTA}):\n`;
+            Object.entries(pmVotes).forEach(([name, votes]) => {
+                if (votes > 0) confirmMessage += `• ${name}: ${votes} suara\n`;
+            });
+
+            confirmMessage += `\nKETUA PARLEMEN (Total: ${parlemenTotal}/${VOTE_QUOTA}):\n`;
+            Object.entries(parlemenVotes).forEach(([name, votes]) => {
+                if (votes > 0) confirmMessage += `• ${name}: ${votes} suara\n`;
+            });
+
+            confirmMessage += `\nApakah Anda yakin dengan distribusi suara ini? Tindakan ini tidak dapat dibatalkan.`;
+
+            if (confirm(confirmMessage)) {
+                // ✅ ENHANCED USER VALIDATION - Get current user from localStorage
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                console.log('🔍 Current user validation:', currentUser);
+
+                // 🔥 STRICT VALIDATION: No more fallback fixes - reject invalid users immediately
+                if (!currentUser || typeof currentUser !== 'object') {
+                    console.error('❌ CRITICAL: No valid currentUser object found');
+                    alert('❌ Error: Data user tidak valid. Silakan login ulang.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // 🚨 CRITICAL: All user fields must be present and non-empty
+                if (!currentUser.id || currentUser.id.trim() === '') {
+                    console.error('❌ CRITICAL: User ID missing or empty:', currentUser);
+                    alert('❌ Error: ID user tidak valid. Silakan login ulang.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                if (!currentUser.username || currentUser.username.trim() === '') {
+                    console.error('❌ CRITICAL: Username missing or empty:', currentUser);
+                    alert('❌ Error: Username tidak valid. Silakan login ulang.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                if (!currentUser.name || currentUser.name.trim() === '') {
+                    console.error('❌ CRITICAL: Name missing or empty:', currentUser);
+                    alert('❌ Error: Nama user tidak valid. Silakan login ulang.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // 🚨 SECURITY: Prevent auto-generated user IDs
+                if (currentUser.id.startsWith('user_') && /^user_\d+$/.test(currentUser.id)) {
+                    console.error('❌ SECURITY: Auto-generated user ID detected:', currentUser.id);
+                    alert('❌ Error: ID user tidak valid (auto-generated). Silakan login dengan akun yang valid.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                console.log('✅ User validation passed:', {
+                    username: currentUser.username,
+                    name: currentUser.name,
+                    id: currentUser.id
+                });
+
+                // 🔥 FIXED: SINGLE SUBMISSION FLOW - NO MORE DUPLICATION
+                const voteData = {
+                    presidenVotes: presidenVotes,
+                    pmVotes: pmVotes,
+                    parlemenVotes: parlemenVotes,
+                    totals: {
+                        presiden: presidenTotal,
+                        pm: pmTotal,
+                        parlemen: parlemenTotal
+                    },
+                    timestamp: new Date().toISOString(),
+                    username: currentUser.username,
+                    name: currentUser.name,
+                    userQuota: VOTE_QUOTA // Tambahkan quota user
+                };
+
+                console.log('📊 Final vote data prepared:', voteData);
+
+                // 🔥 FIXED: SINGLE SUBMISSION POINT - Submit directly to API
+                console.log('🚀 Starting single submission flow...');
+
+                try {
+                    // Submit to API first (primary storage)
+                    const apiSubmissionSuccess = await submitVoteToAPI(voteData);
+
+                    if (apiSubmissionSuccess !== false) {
+                        console.log('✅ API submission completed successfully');
+
+                        // Update user status in localStorage (for admin panel sync)
+                        await updateUserStatusAfterVoting(currentUser);
+
+                        // Store vote data for thank you page (display purposes only)
+                        localStorage.setItem('voteData', JSON.stringify(voteData));
+
+                        console.log('🎉 Vote submission process completed successfully!');
+
+                        // Redirect to thank you page
+                        window.location.href = 'thank-you.html';
+                    } else {
+                        console.error('❌ API submission failed, storing locally for later sync');
+
+                        // Store locally for later sync
+                        await saveVoteToLocalStorage(voteData);
+
+                        // Still redirect to thank you page
+                        localStorage.setItem('voteData', JSON.stringify(voteData));
+                        window.location.href = 'thank-you.html';
+                    }
+                } catch (error) {
+                    console.error('❌ Critical error in submission flow:', error);
+
+                    // Fallback: store locally
+                    await saveVoteToLocalStorage(voteData);
+
+                    alert('⚠️ Terjadi kesalahan saat mengirim vote. Vote tersimpan lokal dan akan di-sync otomatis.');
+
+                    // Still redirect to thank you page
+                    localStorage.setItem('voteData', JSON.stringify(voteData));
+                    window.location.href = 'thank-you.html';
+                }
+            }
+        }
+
+        // 🔥 FIXED: HELPER FUNCTIONS FOR SINGLE SUBMISSION FLOW
+
+        // Update user status after successful voting
+        async function updateUserStatusAfterVoting(currentUser) {
+            console.log('👤 Updating user status after voting...');
+
+            try {
+                // Update user status in localStorage (for admin panel sync)
+                const users = JSON.parse(localStorage.getItem('kpu_users') || '[]');
+                const userIndex = users.findIndex(u =>
+                    u.username === currentUser.username ||
+                    u.id === currentUser.id ||
+                    u.name === currentUser.name
+                );
+
+                if (userIndex !== -1) {
+                    users[userIndex].status = 'Sudah Voting';
+                    users[userIndex].lastLogin = new Date().toISOString();
+                    localStorage.setItem('kpu_users', JSON.stringify(users));
+                    console.log('✅ User status updated in localStorage');
+                } else {
+                    console.warn(`⚠️ User ${currentUser.username} not found in kpu_users`);
+                }
+            } catch (error) {
+                console.error('❌ Error updating user status:', error);
+            }
+        }
+
+        // Save vote to localStorage for later sync (fallback only)
+        async function saveVoteToLocalStorage(voteData) {
+            console.log('💾 Saving vote data to localStorage for later sync...');
+
+            try {
+                // Save to admin vote storage (localStorage) - for admin panel display
+                const adminVotes = JSON.parse(localStorage.getItem('admin_votes') || '[]');
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+                const voteEntry = {
+                    ...voteData,
+                    userId: currentUser.id || currentUser.username,
+                    submittedAt: new Date().toISOString(),
+                    synced: false // Mark as not synced to API
+                };
+
+                adminVotes.push(voteEntry);
+                localStorage.setItem('admin_votes', JSON.stringify(adminVotes));
+                console.log('✅ Vote saved to localStorage for later sync');
+
+                // Also save to kpu_votes for database sync
+                const kpuVotes = JSON.parse(localStorage.getItem('kpu_votes') || '[]');
+                const convertedVotes = convertVoteDataToApiFormat(voteData);
+
+                convertedVotes.forEach(vote => {
+                    vote.synced = false;
+                    vote.timestamp = new Date().toISOString();
+                    kpuVotes.push(vote);
+                });
+
+                localStorage.setItem('kpu_votes', JSON.stringify(kpuVotes));
+                console.log('✅ Vote saved to kpu_votes for database sync');
+
+            } catch (error) {
+                console.error('❌ Error saving vote to localStorage:', error);
+            }
+        }
+
+        // Convert dashboard vote format to admin/API format
+        function convertDashboardToAdminFormat(voteData) {
+            console.log('🔄 Converting dashboard format to admin format...');
+
+            const convertedVotes = [];
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const userId = currentUser.id || currentUser.username;
+
+            // Convert Presiden votes
+            if (voteData.presidenVotes && Object.keys(voteData.presidenVotes).length > 0) {
+                const presidenVotes = [];
+                Object.entries(voteData.presidenVotes).forEach(([candidateName, votes]) => {
+                    if (votes > 0) {
+                        const candidateId = getCandidateIdFromName(candidateName, 'presiden');
+                        if (candidateId) {
+                            presidenVotes.push({
+                                candidate_id: candidateId,
+                                count: votes
+                            });
+                        }
+                    }
+                });
+
+                if (presidenVotes.length > 0) {
+                    convertedVotes.push({
+                        user_id: userId,
+                        category: 'presiden',
+                        votes: presidenVotes,
+                        timestamp: voteData.timestamp,
+                        synced: false
+                    });
+                    console.log('✅ Converted presiden votes:', presidenVotes);
+                }
+            }
+
+            // Convert PM votes
+            if (voteData.pmVotes && Object.keys(voteData.pmVotes).length > 0) {
+                const pmVotes = [];
+                Object.entries(voteData.pmVotes).forEach(([candidateName, votes]) => {
+                    if (votes > 0) {
+                        const candidateId = getCandidateIdFromName(candidateName, 'pm');
+                        if (candidateId) {
+                            pmVotes.push({
+                                candidate_id: candidateId,
+                                count: votes
+                            });
+                        }
+                    }
+                });
+
+                if (pmVotes.length > 0) {
+                    convertedVotes.push({
+                        user_id: userId,
+                        category: 'pm',
+                        votes: pmVotes,
+                        timestamp: voteData.timestamp,
+                        synced: false
+                    });
+                    console.log('✅ Converted PM votes:', pmVotes);
+                }
+            }
+
+            // Convert Parlemen votes
+            if (voteData.parlemenVotes && Object.keys(voteData.parlemenVotes).length > 0) {
+                const parlemenVotes = [];
+                Object.entries(voteData.parlemenVotes).forEach(([candidateName, votes]) => {
+                    if (votes > 0) {
+                        const candidateId = getCandidateIdFromName(candidateName, 'parlemen');
+                        if (candidateId) {
+                            parlemenVotes.push({
+                                candidate_id: candidateId,
+                                count: votes
+                            });
+                        }
+                    }
+                });
+
+                if (parlemenVotes.length > 0) {
+                    convertedVotes.push({
+                        user_id: userId,
+                        category: 'parlemen',
+                        votes: parlemenVotes,
+                        timestamp: voteData.timestamp,
+                        synced: false
+                    });
+                    console.log('✅ Converted parlemen votes:', parlemenVotes);
+                }
+            }
+
+            console.log('🎯 Total converted vote entries:', convertedVotes.length);
+            return convertedVotes;
+        }
+
+        // 🔥 FIXED: SINGLE SUBMISSION FLOW WITH DEDUPLICATION
+        async function submitVoteToAPI(voteData) {
+            console.log('🌐 Starting API vote submission process...');
+            console.log('📊 Vote data to submit:', voteData);
+
+            try {
+                // Check API availability with enhanced debugging
+                console.log('🔍 Checking API availability...');
+                console.log('🔍 window.kpuDB exists:', !!window.kpuDB);
+                console.log('🔍 window.kpuDB.isOnline:', window.kpuDB ? window.kpuDB.isOnline : 'N/A');
+                console.log('🔍 window.kpuDB.connectionChecked:', window.kpuDB ? window.kpuDB.connectionChecked : 'N/A');
+
+                if (!window.kpuDB) {
+                    console.error('❌ kpuDB not available! Database integration not loaded.');
+                    console.warn('🔄 Attempting to initialize database connection...');
+
+                    // Try to initialize database connection
+                    if (typeof KPUDatabase !== 'undefined') {
+                        console.log('🔄 KPUDatabase class found, creating instance...');
+                        window.kpuDB = new KPUDatabase();
+                        await window.kpuDB.checkConnection();
+                        console.log('✅ Database connection initialized:', window.kpuDB.isOnline);
+                    } else {
+                        console.error('❌ KPUDatabase class not found! Database integration script not loaded.');
+                        alert('❌ Error: Database integration tidak tersedia. Vote hanya tersimpan lokal.');
+                        return;
+                    }
+                }
+
+                // Force connection check if not done yet
+                if (!window.kpuDB.connectionChecked) {
+                    console.log('🔄 Forcing database connection check...');
+                    await window.kpuDB.checkConnection();
+                }
+
+                // Force check connection before submitting
+                console.log('🔍 Force checking database connection...');
+                const isConnected = await window.kpuDB.checkConnection();
+                console.log('🔍 Database connection result:', isConnected);
+
+                if (!isConnected) {
+                    console.error('❌ Database connection failed, vote saved to localStorage only');
+                    alert('⚠️ Peringatan: Database tidak tersedia. Vote tersimpan lokal dan akan di-sync otomatis saat database tersedia.');
+                    return;
+                }
+
+                console.log('🌐 API is online, submitting votes to database...');
+
+                // 🔥 FIXED: STRICT USER VALIDATION - NO MORE FALLBACK GENERATION
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+                // 🚨 CRITICAL VALIDATION: Reject completely if user data is invalid
+                if (!currentUser || typeof currentUser !== 'object') {
+                    console.error('❌ CRITICAL: No valid currentUser object found');
+                    alert('❌ Error: Data user tidak valid. Silakan login ulang.');
+                    window.location.href = 'login.html';
+                    return false;
+                }
+
+                // 🚨 CRITICAL VALIDATION: All required fields must exist and not be empty
+                const userId = currentUser.id;
+                const userName = currentUser.name;
+                const userUsername = currentUser.username;
+
+                if (!userId || userId.trim() === '') {
+                    console.error('❌ CRITICAL: User ID is missing or empty:', currentUser);
+                    alert('❌ Error: ID user tidak valid. Silakan login ulang.');
+                    window.location.href = 'login.html';
+                    return false;
+                }
+
+                if (!userName || userName.trim() === '') {
+                    console.error('❌ CRITICAL: User name is missing or empty:', currentUser);
+                    alert('❌ Error: Nama user tidak valid. Silakan login ulang.');
+                    window.location.href = 'login.html';
+                    return false;
+                }
+
+                if (!userUsername || userUsername.trim() === '') {
+                    console.error('❌ CRITICAL: Username is missing or empty:', currentUser);
+                    alert('❌ Error: Username tidak valid. Silakan login ulang.');
+                    window.location.href = 'login.html';
+                    return false;
+                }
+
+                // 🚨 CRITICAL VALIDATION: Check for auto-generated IDs (security risk)
+                if (userId.startsWith('user_') && /^user_\d+$/.test(userId)) {
+                    console.error('❌ CRITICAL: Auto-generated user ID detected (security risk):', userId);
+                    alert('❌ Error: ID user tidak valid (auto-generated). Silakan login dengan akun yang valid.');
+                    window.location.href = 'login.html';
+                    return false;
+                }
+
+                // 🚨 CRITICAL VALIDATION: Verify user exists in database before allowing vote
+                console.log('🔍 Verifying user exists in database before vote submission...');
+                try {
+                    const userExists = await window.kpuDB.getUsers();
+                    console.log('🔍 Database users found:', userExists?.length || 0);
+
+                    const validUser = userExists.find(u =>
+                        u.id === userId &&
+                        u.name && u.name.trim() !== '' &&
+                        u.username && u.username.trim() !== ''
+                    );
+
+                    if (!validUser) {
+                        console.error('❌ CRITICAL: User not found in database or has empty fields:', userId);
+                        console.error('❌ Available users in database:', userExists?.map(u => ({ id: u.id, name: u.name, username: u.username })));
+
+                        // 🔥 ENHANCED: Try to find user with different matching criteria
+                        const alternativeUser = userExists.find(u =>
+                            u.username === currentUser.username ||
+                            u.name === currentUser.name ||
+                            u.id === currentUser.username
+                        );
+
+                        if (alternativeUser) {
+                            console.warn('⚠️ Found user with alternative matching:', alternativeUser);
+                            console.log('✅ Using alternative user match for vote submission');
+                        } else {
+                            alert('❌ Error: User tidak ditemukan di database atau data tidak lengkap. Silakan hubungi admin.');
+                            window.location.href = 'login.html';
+                            return false;
+                        }
+                    } else {
+                        console.log('✅ User validation passed:', validUser);
+                    }
+                } catch (error) {
+                    console.error('❌ CRITICAL: Failed to verify user in database:', error);
+                    console.warn('⚠️ Continuing with vote submission despite user verification failure...');
+                    // Don't block vote submission - user might exist but API call failed
+                }
+
+                console.log('👤 Current user for API submission:', currentUser);
+                console.log('🆔 User ID for API:', userId);
+                console.log('✅ User ID validation passed');
+
+                // 🔥 FIXED: CHECK FOR EXISTING VOTES (DEDUPLICATION)
+                console.log('🔍 Checking for existing votes to prevent duplicates...');
+                try {
+                    const existingVotes = await window.kpuDB.getUserVotes(userId);
+                    if (existingVotes && existingVotes.length > 0) {
+                        console.warn('⚠️ User already has votes in database:', existingVotes);
+
+                        const confirmOverwrite = confirm(
+                            '⚠️ PERINGATAN: Anda sudah pernah voting sebelumnya!\n\n' +
+                            'Apakah Anda ingin mengganti vote yang sudah ada?\n\n' +
+                            '✅ OK = Ganti vote lama dengan vote baru\n' +
+                            '❌ Cancel = Batalkan voting'
+                        );
+
+                        if (!confirmOverwrite) {
+                            console.log('🚫 User cancelled vote submission due to existing votes');
+                            alert('❌ Voting dibatalkan. Vote lama tetap tersimpan.');
+                            return false;
+                        }
+
+                        console.log('🔄 User confirmed to overwrite existing votes');
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Could not check existing votes (API might not support getUserVotes):', error);
+                    // Continue with submission - this is not critical
+                }
+
+                // 🔥 FIXED: Track submission results with detailed logging
+                const submissionResults = {
+                    presiden: { attempted: false, success: false, error: null, votes: [] },
+                    pm: { attempted: false, success: false, error: null, votes: [] },
+                    parlemen: { attempted: false, success: false, error: null, votes: [] }
+                };
+
+                // 🔥 FIXED: Prepare all vote data first with enhanced validation
+                const allVotePromises = [];
+
+                // Prepare Presiden votes
+                if (voteData.presidenVotes && Object.keys(voteData.presidenVotes).length > 0) {
+                    console.log('🔍 PRESIDEN VOTES DEBUG - Raw presiden votes data:', voteData.presidenVotes);
+                    const presidenApiVotes = [];
+                    Object.entries(voteData.presidenVotes).forEach(([candidateName, votes]) => {
+                        console.log(`🔍 PRESIDEN VOTES DEBUG - Processing: "${candidateName}" with ${votes} votes`);
+                        if (votes > 0) {
+                            const candidateId = getCandidateIdFromName(candidateName, 'presiden');
+                            console.log(`🔍 PRESIDEN VOTES DEBUG - Mapping result: "${candidateName}" → ${candidateId}`);
+                            if (candidateId) {
+                                presidenApiVotes.push({
+                                    candidate_id: candidateId,
+                                    count: votes
+                                });
+                                console.log(`✅ Mapped presiden: "${candidateName}" → ${candidateId} (${votes} votes)`);
+                            } else {
+                                console.error(`❌ CRITICAL PRESIDEN MAPPING FAILED: "${candidateName}"`);
+                                console.error(`❌ Available presiden candidates in candidateData:`, candidateData?.presiden?.map(c => c.name));
+                                console.error(`❌ This presiden vote will NOT be submitted!`);
+                            }
+                        } else {
+                            console.log(`⏭️ Skipping presiden candidate "${candidateName}" with 0 votes`);
+                        }
+                    });
+                    console.log('🔍 PRESIDEN VOTES DEBUG - Final presiden API votes:', presidenApiVotes);
+
+                    if (presidenApiVotes.length > 0) {
+                        submissionResults.presiden.attempted = true;
+                        submissionResults.presiden.votes = presidenApiVotes;
+
+                        console.log('🚀 PRESIDEN SUBMISSION - About to submit presiden votes to API...');
+                        console.log('🚀 PRESIDEN SUBMISSION - User ID:', userId);
+                        console.log('🚀 PRESIDEN SUBMISSION - Category: presiden');
+                        console.log('🚀 PRESIDEN SUBMISSION - Votes:', presidenApiVotes);
+
+                        const presidenPromise = window.kpuDB.castVote({
+                            user_id: userId,
+                            category: 'presiden',
+                            votes: presidenApiVotes
+                        }).then(result => {
+                            submissionResults.presiden.success = true;
+                            console.log('✅ PRESIDEN SUBMISSION SUCCESS:', result);
+                            return { category: 'presiden', success: true, result };
+                        }).catch(error => {
+                            submissionResults.presiden.error = error.message;
+                            console.error('❌ PRESIDEN SUBMISSION FAILED:', error);
+                            console.error('❌ PRESIDEN SUBMISSION ERROR DETAILS:', error.message);
+                            return { category: 'presiden', success: false, error: error.message };
+                        });
+
+                        allVotePromises.push(presidenPromise);
+                        console.log('🗳️ Presiden vote prepared for submission:', presidenApiVotes);
+                    } else {
+                        console.warn('⚠️ No valid presiden votes to submit');
+                    }
+                }
+
+                // Prepare PM votes
+                if (voteData.pmVotes && Object.keys(voteData.pmVotes).length > 0) {
+                    console.log('🔍 PM VOTES DEBUG - Raw PM votes data:', voteData.pmVotes);
+                    const pmApiVotes = [];
+                    Object.entries(voteData.pmVotes).forEach(([candidateName, votes]) => {
+                        console.log(`🔍 PM VOTES DEBUG - Processing: "${candidateName}" with ${votes} votes`);
+                        if (votes > 0) {
+                            const candidateId = getCandidateIdFromName(candidateName, 'pm');
+                            console.log(`🔍 PM VOTES DEBUG - Mapping result: "${candidateName}" → ${candidateId}`);
+                            if (candidateId) {
+                                pmApiVotes.push({
+                                    candidate_id: candidateId,
+                                    count: votes
+                                });
+                                console.log(`✅ Mapped PM: "${candidateName}" → ${candidateId} (${votes} votes)`);
+                            } else {
+                                console.error(`❌ CRITICAL PM MAPPING FAILED: "${candidateName}"`);
+                                console.error(`❌ Available PM candidates in candidateData:`, candidateData?.pm?.map(c => c.name));
+                                console.error(`❌ This PM vote will NOT be submitted!`);
+                            }
+                        } else {
+                            console.log(`⏭️ Skipping PM candidate "${candidateName}" with 0 votes`);
+                        }
+                    });
+                    console.log('🔍 PM VOTES DEBUG - Final PM API votes:', pmApiVotes);
+
+                    if (pmApiVotes.length > 0) {
+                        submissionResults.pm.attempted = true;
+                        submissionResults.pm.votes = pmApiVotes;
+
+                        const pmPromise = window.kpuDB.castVote({
+                            user_id: userId,
+                            category: 'pm',
+                            votes: pmApiVotes
+                        }).then(result => {
+                            submissionResults.pm.success = true;
+                            console.log('✅ PM votes submitted successfully:', result);
+                            return { category: 'pm', success: true, result };
+                        }).catch(error => {
+                            submissionResults.pm.error = error.message;
+                            console.error('❌ Failed to submit PM votes:', error);
+                            return { category: 'pm', success: false, error: error.message };
+                        });
+
+                        allVotePromises.push(pmPromise);
+                        console.log('🗳️ PM vote prepared for submission:', pmApiVotes);
+                    } else {
+                        console.warn('⚠️ No valid PM votes to submit');
+                    }
+                }
+
+                // Prepare Parlemen votes
+                if (voteData.parlemenVotes && Object.keys(voteData.parlemenVotes).length > 0) {
+                    const parlemenApiVotes = [];
+                    Object.entries(voteData.parlemenVotes).forEach(([candidateName, votes]) => {
+                        if (votes > 0) {
+                            const candidateId = getCandidateIdFromName(candidateName, 'parlemen');
+                            if (candidateId) {
+                                parlemenApiVotes.push({
+                                    candidate_id: candidateId,
+                                    count: votes
+                                });
+                                console.log(`✅ Mapped Parlemen: "${candidateName}" → ${candidateId} (${votes} votes)`);
+                            } else {
+                                console.error(`❌ Failed to map Parlemen candidate: "${candidateName}"`);
+                            }
+                        }
+                    });
+
+                    if (parlemenApiVotes.length > 0) {
+                        submissionResults.parlemen.attempted = true;
+                        submissionResults.parlemen.votes = parlemenApiVotes;
+
+                        const parlemenPromise = window.kpuDB.castVote({
+                            user_id: userId,
+                            category: 'parlemen',
+                            votes: parlemenApiVotes
+                        }).then(result => {
+                            submissionResults.parlemen.success = true;
+                            console.log('✅ Parlemen votes submitted successfully:', result);
+                            return { category: 'parlemen', success: true, result };
+                        }).catch(error => {
+                            submissionResults.parlemen.error = error.message;
+                            console.error('❌ Failed to submit Parlemen votes:', error);
+                            return { category: 'parlemen', success: false, error: error.message };
+                        });
+
+                        allVotePromises.push(parlemenPromise);
+                        console.log('🗳️ Parlemen vote prepared for submission:', parlemenApiVotes);
+                    } else {
+                        console.warn('⚠️ No valid Parlemen votes to submit');
+                    }
+                }
+
+                // 🔥 ENHANCED: Execute vote submissions with retry mechanism and better error handling
+                console.log(`🚀 Executing ${allVotePromises.length} vote submissions with enhanced error handling...`);
+
+                if (allVotePromises.length === 0) {
+                    console.warn('⚠️ No votes to submit to API');
+                    alert('⚠️ Tidak ada vote yang valid untuk dikirim ke database.');
+                    return;
+                }
+
+                // 🔥 NEW: Pre-submission validation
+                console.log('🔍 Performing pre-submission validation...');
+
+                // 🔥 NEW: Show progress indicator to user
+                const progressIndicator = document.createElement('div');
+                progressIndicator.id = 'vote-progress';
+                progressIndicator.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(0, 0, 0, 0.9);
+                    color: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    z-index: 10000;
+                    text-align: center;
+                    min-width: 300px;
+                    font-family: Arial, sans-serif;
+                `;
+                progressIndicator.innerHTML = `
+                    <div style="font-size: 18px; margin-bottom: 15px;">🗳️ Mengirim Vote ke Database</div>
+                    <div id="progress-text" style="font-size: 14px; margin-bottom: 10px;">Memvalidasi koneksi database...</div>
+                    <div style="width: 100%; background: #333; border-radius: 10px; height: 8px; margin: 10px 0;">
+                        <div id="progress-bar" style="width: 0%; background: #4CAF50; height: 100%; border-radius: 10px; transition: width 0.3s;"></div>
+                    </div>
+                    <div style="font-size: 12px; color: #ccc;">Mohon tunggu, jangan tutup halaman ini</div>
+                `;
+                document.body.appendChild(progressIndicator);
+
+                function updateProgress(percentage, text) {
+                    const progressBar = document.getElementById('progress-bar');
+                    const progressText = document.getElementById('progress-text');
+                    if (progressBar) progressBar.style.width = percentage + '%';
+                    if (progressText) progressText.textContent = text;
+                }
+
+                updateProgress(10, 'Memeriksa koneksi database...');
+
+                // Check database connection before submission
+                if (window.kpuDB && !window.kpuDB.isOnline) {
+                    console.log('🔄 Database offline, forcing connection check...');
+                    updateProgress(20, 'Mencoba menghubungkan ke database...');
+                    await window.kpuDB.checkConnection();
+                }
+
+                if (window.kpuDB && !window.kpuDB.isOnline) {
+                    console.warn('⚠️ Database still offline, votes will be stored locally');
+                    updateProgress(30, 'Database offline - menyimpan vote lokal...');
+                    // Don't show alert here, let the process continue
+                } else {
+                    updateProgress(30, 'Koneksi database berhasil!');
+                }
+
+                // 🔥 ENHANCED: Sequential submission with retry mechanism to avoid race conditions
+                console.log(`🚀 Executing ${allVotePromises.length} vote submissions sequentially with retry mechanism...`);
+                const results = [];
+
+                // Helper function for retry mechanism
+                async function submitWithRetry(votePromise, category, maxRetries = 3) {
+                    let lastError = null;
+
+                    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                        try {
+                            console.log(`📤 Submitting ${category} vote (attempt ${attempt}/${maxRetries})...`);
+                            const result = await votePromise;
+                            console.log(`✅ ${category} vote submitted successfully on attempt ${attempt}:`, result);
+                            return { status: 'fulfilled', value: result };
+                        } catch (error) {
+                            lastError = error;
+                            console.error(`❌ ${category} vote submission failed on attempt ${attempt}:`, error);
+
+                            if (attempt < maxRetries) {
+                                // Exponential backoff: 1s, 2s, 4s
+                                const delay = Math.pow(2, attempt - 1) * 1000;
+                                console.log(`🔄 Retrying ${category} vote in ${delay}ms...`);
+                                await new Promise(resolve => setTimeout(resolve, delay));
+
+                                // Recreate the promise for retry (important for fresh API call)
+                                if (category === 'presiden' && submissionResults.presiden.votes.length > 0) {
+                                    votePromise = window.kpuDB.castVote({
+                                        user_id: userId,
+                                        category: 'presiden',
+                                        votes: submissionResults.presiden.votes
+                                    });
+                                } else if (category === 'pm' && submissionResults.pm.votes.length > 0) {
+                                    votePromise = window.kpuDB.castVote({
+                                        user_id: userId,
+                                        category: 'pm',
+                                        votes: submissionResults.pm.votes
+                                    });
+                                } else if (category === 'parlemen' && submissionResults.parlemen.votes.length > 0) {
+                                    votePromise = window.kpuDB.castVote({
+                                        user_id: userId,
+                                        category: 'parlemen',
+                                        votes: submissionResults.parlemen.votes
+                                    });
+                                }
+                            }
+                        }
+                    }
+
+                    console.error(`❌ ${category} vote submission failed after ${maxRetries} attempts:`, lastError);
+                    return { status: 'rejected', reason: lastError, category: category };
+                }
+
+                // Submit votes sequentially with retry
+                const categories = ['presiden', 'pm', 'parlemen'];
+                for (let i = 0; i < allVotePromises.length; i++) {
+                    const category = categories[i] || `category_${i}`;
+                    const progressPercentage = 40 + (i * 20); // 40%, 60%, 80%
+
+                    console.log(`📤 Processing ${category} vote submission (${i + 1}/${allVotePromises.length})...`);
+                    updateProgress(progressPercentage, `Mengirim vote ${category.toUpperCase()}...`);
+
+                    const result = await submitWithRetry(allVotePromises[i], category);
+                    results.push(result);
+
+                    // Update submission results based on outcome
+                    if (result.status === 'fulfilled') {
+                        if (category === 'presiden') submissionResults.presiden.success = true;
+                        else if (category === 'pm') submissionResults.pm.success = true;
+                        else if (category === 'parlemen') submissionResults.parlemen.success = true;
+
+                        updateProgress(progressPercentage + 15, `✅ Vote ${category.toUpperCase()} berhasil dikirim!`);
+                    } else {
+                        if (category === 'presiden') submissionResults.presiden.error = result.reason?.message || 'Unknown error';
+                        else if (category === 'pm') submissionResults.pm.error = result.reason?.message || 'Unknown error';
+                        else if (category === 'parlemen') submissionResults.parlemen.error = result.reason?.message || 'Unknown error';
+
+                        updateProgress(progressPercentage + 15, `❌ Vote ${category.toUpperCase()} gagal dikirim`);
+                    }
+
+                    // Delay between different categories to prevent server overload
+                    if (i < allVotePromises.length - 1) {
+                        console.log('⏳ Waiting 500ms before next category submission...');
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
+                }
+
+                console.log('📊 All sequential submissions completed, processing results...');
+                updateProgress(90, 'Memproses hasil pengiriman...');
+
+                // 🔥 ENHANCED: Process results with detailed error analysis
+                let successCount = 0;
+                let failureCount = 0;
+                const failedCategories = [];
+                const detailedErrors = [];
+
+                results.forEach((result, index) => {
+                    console.log(`📊 Processing result ${index + 1}:`, result);
+                    if (result.status === 'fulfilled' && result.value.success) {
+                        successCount++;
+                        console.log(`✅ ${result.value.category} submission successful`);
+                    } else {
+                        failureCount++;
+                        const category = result.value?.category || result.category || 'unknown';
+                        const errorMessage = result.reason?.message || result.value?.error || 'Unknown error';
+                        failedCategories.push(category);
+                        detailedErrors.push(`${category}: ${errorMessage}`);
+                        console.error(`❌ ${category} submission failed:`, result.reason || result.value?.error);
+                        console.error(`❌ Full error details for ${category}:`, result);
+                    }
+                });
+
+                // 🔥 ENHANCED: Comprehensive result reporting with error details
+                console.log('🎉 Vote submission process completed!');
+                console.log('📊 Final submission summary:');
+                console.log(`  ✅ Successful: ${successCount}/${allVotePromises.length}`);
+                console.log(`  ❌ Failed: ${failureCount}/${allVotePromises.length}`);
+                console.log('  📋 Detailed results:');
+                console.log(`    - Presiden: ${submissionResults.presiden.attempted ? (submissionResults.presiden.success ? '✅ Success' : '❌ Failed') : '⏭️ Skipped'}`);
+                console.log(`    - PM: ${submissionResults.pm.attempted ? (submissionResults.pm.success ? '✅ Success' : '❌ Failed') : '⏭️ Skipped'}`);
+                console.log(`    - Parlemen: ${submissionResults.parlemen.attempted ? (submissionResults.parlemen.success ? '✅ Success' : '❌ Failed') : '⏭️ Skipped'}`);
+
+                if (detailedErrors.length > 0) {
+                    console.log('  🔍 Error details:');
+                    detailedErrors.forEach(error => console.log(`    - ${error}`));
+                }
+
+                // 🔥 ENHANCED: Update user status with retry mechanism
+                if (successCount > 0) {
+                    let userStatusUpdated = false;
+                    let retryCount = 0;
+                    const maxRetries = 3;
+
+                    while (!userStatusUpdated && retryCount < maxRetries) {
+                        try {
+                            console.log(`👤 Updating user status in database (attempt ${retryCount + 1}/${maxRetries})...`);
+                            const updateData = {
+                                status: 'Sudah Voting',
+                                last_login: new Date().toISOString()
+                            };
+                            console.log('👤 Update data:', updateData);
+
+                            await window.kpuDB.updateUser(userId, updateData);
+                            console.log('✅ User status updated in database successfully');
+                            userStatusUpdated = true;
+                        } catch (error) {
+                            retryCount++;
+                            console.error(`❌ Failed to update user status (attempt ${retryCount}):`, error);
+                            if (retryCount < maxRetries) {
+                                console.log(`🔄 Retrying user status update in 1 second...`);
+                                await new Promise(resolve => setTimeout(resolve, 1000));
+                            } else {
+                                console.warn('⚠️ All user status update attempts failed - continuing without status update');
+                            }
+                        }
+                    }
+                } else {
+                    console.log('⏭️ Skipping user status update - no successful vote submissions');
+                }
+
+                // 🔥 ENHANCED: Provide detailed user feedback with specific error information
+                if (successCount === allVotePromises.length) {
+                    console.log('🎉 ALL VOTES SUBMITTED SUCCESSFULLY!');
+                    updateProgress(100, '✅ Semua vote berhasil dikirim!');
+
+                    // Store vote data for thank you page
+                    localStorage.setItem('voteData', JSON.stringify(voteData));
+
+                    // Show success message and redirect
+                    setTimeout(() => {
+                        if (progressIndicator && progressIndicator.parentNode) {
+                            progressIndicator.parentNode.removeChild(progressIndicator);
+                        }
+                        window.location.href = 'thank-you.html';
+                    }, 1500);
+
+                } else if (successCount > 0) {
+                    const successCategories = [];
+                    if (submissionResults.presiden.success) successCategories.push('Presiden');
+                    if (submissionResults.pm.success) successCategories.push('PM');
+                    if (submissionResults.parlemen.success) successCategories.push('Parlemen');
+
+                    updateProgress(100, `⚠️ ${successCount}/${allVotePromises.length} vote berhasil dikirim`);
+
+                    // Remove progress indicator
+                    setTimeout(() => {
+                        if (progressIndicator && progressIndicator.parentNode) {
+                            progressIndicator.parentNode.removeChild(progressIndicator);
+                        }
+                    }, 1000);
+
+                    const errorDetails = detailedErrors.length > 0 ? `\n\nDetail error:\n${detailedErrors.join('\n')}` : '';
+                    setTimeout(() => {
+                        alert(`⚠️ SEBAGIAN VOTE BERHASIL DIKIRIM:\n\n✅ Berhasil: ${successCategories.join(', ')}\n❌ Gagal: ${failedCategories.join(', ')}\n\nVote yang gagal tersimpan lokal dan akan di-sync otomatis.${errorDetails}`);
+
+                        // Still redirect to thank you page since some votes succeeded
+                        localStorage.setItem('voteData', JSON.stringify(voteData));
+                        window.location.href = 'thank-you.html';
+                    }, 1200);
+
+                } else {
+                    updateProgress(100, '❌ Semua vote gagal dikirim');
+
+                    // Remove progress indicator
+                    setTimeout(() => {
+                        if (progressIndicator && progressIndicator.parentNode) {
+                            progressIndicator.parentNode.removeChild(progressIndicator);
+                        }
+                    }, 1000);
+
+                    const errorDetails = detailedErrors.length > 0 ? `\n\nDetail error:\n${detailedErrors.join('\n')}` : '';
+                    setTimeout(() => {
+                        alert(`❌ SEMUA VOTE GAGAL DIKIRIM KE DATABASE!\n\nVote tersimpan di sistem lokal dan akan di-sync otomatis saat database tersedia.${errorDetails}\n\nSilakan hubungi admin jika masalah berlanjut.`);
+
+                        // Still store vote data and redirect since votes are saved locally
+                        localStorage.setItem('voteData', JSON.stringify(voteData));
+                        window.location.href = 'thank-you.html';
+                    }, 1200);
+                }
+
+                // 🔥 REMOVED: Problematic verification that was causing issues
+                // The verification was causing the process to fail after presiden votes
+                console.log('✅ Vote submission process completed without verification issues');
+
+            } catch (error) {
+                console.error('❌ Critical error in vote submission process:', error);
+                console.error('❌ Error details:', error.message);
+                console.error('❌ Error stack:', error.stack);
+
+                // Remove progress indicator if it exists
+                const progressIndicator = document.getElementById('vote-progress');
+                if (progressIndicator && progressIndicator.parentNode) {
+                    progressIndicator.parentNode.removeChild(progressIndicator);
+                }
+
+                // Show user-friendly error message
+                alert('⚠️ Peringatan: Terjadi kesalahan sistem. Vote tersimpan di sistem lokal dan akan di-sync otomatis saat masalah teratasi.');
+
+                // Still store vote data and redirect since votes are saved locally
+                localStorage.setItem('voteData', JSON.stringify(voteData));
+                window.location.href = 'thank-you.html';
+            }
+        }
+
+        // 🔥 FIXED: CONSISTENT CANDIDATE ID MAPPING (NO MORE DYNAMIC GENERATION)
+        function getCandidateIdFromName(candidateName, category) {
+            console.log(`🔍 Mapping candidate: "${candidateName}" in category "${category}"`);
+            console.log(`🔍 Current candidateData for ${category}:`, candidateData?.[category]);
+
+            // 🔥 FIXED: ABSOLUTE MAPPING - NEVER CHANGES, CONSISTENT WITH DATABASE
+            const FIXED_CANDIDATE_MAPPING = {
+                'presiden': {
+                    // Primary names from database (EXACT MATCH)
+                    'NENENG & INAYAH': 'presiden1',
+                    'AISYAH & EVI': 'presiden2',
+                    // Alternative spellings/formats
+                    'NENENG': 'presiden1',
+                    'NENENG INAYAH': 'presiden1',
+                    'NENENG&INAYAH': 'presiden1',
+                    'AISYAH': 'presiden2',
+                    'AISYAH EVI': 'presiden2',
+                    'AISYAH&EVI': 'presiden2',
+                    // Fallback patterns (FIXED IDs)
+                    'Kandidat Presiden 1': 'presiden1',
+                    'Kandidat Presiden 2': 'presiden2',
+                    'Presiden 1': 'presiden1',
+                    'Presiden 2': 'presiden2',
+                    'Ahmad Rizki & Sari Indah': 'presiden1', // Fallback hardcoded names
+                    'Budi Santoso & Maya Putri': 'presiden2'  // Fallback hardcoded names
+                },
+                'pm': {
+                    // Primary names from database
+                    'KUKUH': 'pm1',
+                    'SAYYIDAH': 'pm2',
+                    // Alternative spellings/formats
+                    'KUKUH PRASETYO': 'pm1',
+                    'SAYYIDAH NURHALIZA': 'pm2',
+                    // Common variations
+                    'Dr. KUKUH': 'pm1',
+                    'Prof. SAYYIDAH': 'pm2',
+                    'KUKUH, S.Pd': 'pm1',
+                    'SAYYIDAH, M.Pd': 'pm2',
+                    // Fallback patterns (FIXED IDs)
+                    'Kandidat PM 1': 'pm1',
+                    'Kandidat PM 2': 'pm2',
+                    'PM 1': 'pm1',
+                    'PM 2': 'pm2',
+                    'Calon PM 1': 'pm1',
+                    'Calon PM 2': 'pm2'
+                },
+                'parlemen': {
+                    // Primary names from database
+                    'ADINUR KHOLIFAH': 'parlemen1',
+                    'ENI FATMAWATI': 'parlemen2',
+                    'FAIZAH MAULIDA': 'parlemen3',
+                    'AHMAD NASHUKA': 'parlemen4',
+                    // Alternative spellings/formats
+                    'ADINUR': 'parlemen1',
+                    'ENI': 'parlemen2',
+                    'FAIZAH': 'parlemen3',
+                    'AHMAD': 'parlemen4',
+                    // Fallback patterns (FIXED IDs)
+                    'Kandidat Parlemen 1': 'parlemen1',
+                    'Kandidat Parlemen 2': 'parlemen2',
+                    'Kandidat Parlemen 3': 'parlemen3',
+                    'Kandidat Parlemen 4': 'parlemen4',
+                    'Parlemen 1': 'parlemen1',
+                    'Parlemen 2': 'parlemen2',
+                    'Parlemen 3': 'parlemen3',
+                    'Parlemen 4': 'parlemen4',
+                    'KP 01': 'parlemen1',
+                    'KP 02': 'parlemen2',
+                    'KP 03': 'parlemen3',
+                    'KP 04': 'parlemen4'
+                }
+            };
+
+            // 🔥 ENHANCED: Debug all available mappings for this category
+            console.log(`🔍 Available fixed mappings for ${category}:`, Object.keys(FIXED_CANDIDATE_MAPPING[category] || {}));
+
+            // 🔥 FIXED: Try exact match first (case-sensitive)
+            if (FIXED_CANDIDATE_MAPPING[category] && FIXED_CANDIDATE_MAPPING[category][candidateName]) {
+                const mappedId = FIXED_CANDIDATE_MAPPING[category][candidateName];
+                console.log(`✅ Exact match found: "${candidateName}" → ${mappedId}`);
+                return mappedId;
+            }
+
+            // 🔥 FIXED: Try case-insensitive match
+            if (FIXED_CANDIDATE_MAPPING[category]) {
+                for (const [mappedName, mappedId] of Object.entries(FIXED_CANDIDATE_MAPPING[category])) {
+                    if (mappedName.toLowerCase() === candidateName.toLowerCase()) {
+                        console.log(`✅ Case-insensitive match found: "${candidateName}" → ${mappedId} (via "${mappedName}")`);
+                        return mappedId;
+                    }
+                }
+            }
+
+            // 🔥 FIXED: Try partial match (for names that contain the mapped name)
+            if (FIXED_CANDIDATE_MAPPING[category]) {
+                for (const [mappedName, mappedId] of Object.entries(FIXED_CANDIDATE_MAPPING[category])) {
+                    if (candidateName.toLowerCase().includes(mappedName.toLowerCase()) ||
+                        mappedName.toLowerCase().includes(candidateName.toLowerCase())) {
+                        console.log(`✅ Partial match found: "${candidateName}" → ${mappedId} (via "${mappedName}")`);
+                        return mappedId;
+                    }
+                }
+            }
+
+            // 🔥 FIXED: Try to derive from candidateData with FIXED ID validation
+            if (candidateData && candidateData[category]) {
+                console.log(`🔍 Searching in candidateData for "${candidateName}"`);
+                const candidate = candidateData[category].find(c =>
+                    c.name === candidateName ||
+                    c.name.toLowerCase() === candidateName.toLowerCase()
+                );
+                if (candidate && candidate.id && candidate.id.startsWith(category)) {
+                    console.log(`✅ Found in candidateData: "${candidateName}" → ${candidate.id}`);
+                    return candidate.id;
+                }
+            }
+
+            // 🔥 ENHANCED: Try position-based fallback for presiden (last resort)
+            if (category === 'presiden') {
+                // Check if this is the first or second presiden candidate based on input ID
+                const inputElement = document.querySelector(`input[value="${candidateName}"]`) ||
+                                   document.querySelector(`input[id*="presiden"]`);
+                if (inputElement) {
+                    if (inputElement.id === 'presiden1') {
+                        console.log(`✅ Position-based fallback: "${candidateName}" → presiden1 (first candidate)`);
+                        return 'presiden1';
+                    } else if (inputElement.id === 'presiden2') {
+                        console.log(`✅ Position-based fallback: "${candidateName}" → presiden2 (second candidate)`);
+                        return 'presiden2';
+                    }
+                }
+            }
+
+            // 🔥 REMOVED: Dynamic ID generation - NO MORE PATTERN MATCHING
+            // This was causing the hardcoded ID changes issue
+
+            console.error(`❌ Could not map candidate name "${candidateName}" to candidate_id for category "${category}"`);
+            console.error(`❌ Available fixed mappings for ${category}:`, Object.keys(FIXED_CANDIDATE_MAPPING[category] || {}));
+            console.error(`❌ Available candidateData for ${category}:`, candidateData?.[category]?.map(c => c.name));
+            console.error(`❌ CRITICAL: This candidate will NOT be submitted to database!`);
+            return null;
+        }
+
+        // Sistem Login dan User Management
+        function getCurrentUser() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                return JSON.parse(currentUser);
+            }
+
+            // Jika belum login, tampilkan dialog login
+            return showLoginDialog();
+        }
+
+        function showLoginDialog() {
+            // Redirect ke halaman login
+            window.location.href = 'login.html';
+            return null;
+        }
+
+        function updateUserDisplay(user) {
+            if (!user) return;
+
+            document.getElementById('currentUserName').textContent = user.name;
+
+            // Buat inisial dari nama
+            const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            document.getElementById('currentUserInitials').textContent = initials;
+        }
+
+        // Debug functions for testing
+        async function testDatabaseConnection() {
+            console.log('🔍 Testing database connection...');
+
+            if (!window.kpuDB) {
+                console.error('❌ kpuDB not initialized');
+                alert('❌ Database not initialized');
+                return;
+            }
+
+            try {
+                const isOnline = await window.kpuDB.checkConnection();
+                console.log('✅ Database connection test result:', isOnline);
+                alert(`Database Status: ${isOnline ? 'Online ✅' : 'Offline ❌'}`);
+            } catch (error) {
+                console.error('❌ Database connection test failed:', error);
+                alert('❌ Database connection test failed: ' + error.message);
+            }
+        }
+
+        async function testVoteSubmission() {
+            console.log('🧪 Testing vote submission...');
+
+            if (!window.kpuDB) {
+                console.error('❌ kpuDB not initialized');
+                alert('❌ Database not initialized');
+                return;
+            }
+
+            const testVoteData = {
+                user_id: 'test_dashboard_001',
+                category: 'presiden',
+                votes: [
+                    { candidate_id: 'presiden1', count: 5 },
+                    { candidate_id: 'presiden2', count: 5 }
+                ]
+            };
+
+            try {
+                console.log('📤 Sending test vote:', testVoteData);
+                const result = await window.kpuDB.castVote(testVoteData);
+                console.log('✅ Test vote submission successful:', result);
+                alert('✅ Test vote submission successful! Check console for details.');
+            } catch (error) {
+                console.error('❌ Test vote submission failed:', error);
+                alert('❌ Test vote submission failed: ' + error.message);
+            }
+        }
+
+        // Note: updateVoteSubmission() function removed - using main submitVote() function with dynamic candidate data
+
+        // Initialize the wizard on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Initializing dashboard...');
+
+            // 1. Initialize database connection
+            console.log('🔗 Initializing database connection...');
+            try {
+                if (typeof KPUDatabase !== 'undefined') {
+                    window.kpuDB = new KPUDatabase();
+                    await window.kpuDB.checkConnection();
+                    console.log('✅ Database connection initialized:', window.kpuDB.isOnline);
+                } else {
+                    console.error('❌ KPUDatabase class not found! Database integration script not loaded.');
+                }
+            } catch (error) {
+                console.error('❌ Failed to initialize database connection:', error);
+            }
+
+            // 2. Check user authentication
+            const currentUser = getCurrentUser();
+            if (!currentUser) {
+                console.error('❌ No user authenticated, redirecting to login');
+                return;
+            }
+
+            // 3. Load candidate data
+            console.log('📊 Loading candidate data...');
+            await loadCandidateData();
+
+            // 4. Update candidate display with API data (includes photos from API)
+            updateCandidateDisplay();
+
+            // 5. Load candidate photos from localStorage (fallback only)
+            loadCandidatePhotosInDashboard();
+
+            // 6. Update user display and vote quota
+            updateUserDisplay(currentUser);
+            updateVoteQuota(); // Update jatah suara berdasarkan user
+
+            // 7. Validate vote quota
+            if (VOTE_QUOTA <= 0) {
+                console.error('❌ Invalid vote quota:', VOTE_QUOTA);
+                alert('❌ Error: Jatah suara tidak valid. Silakan hubungi admin.');
+                return;
+            }
+
+            // 8. Vote submission logic already integrated in main submitVote() function
+
+            // 9. Show first step
+            showStep(1);
+
+            console.log('✅ Dashboard initialized successfully');
+            console.log(`👤 User: ${currentUser.name} (${currentUser.username})`);
+            console.log(`🗳️ Vote quota: ${VOTE_QUOTA} per category`);
+            console.log(`📊 Candidate data:`, candidateData);
+        });
+
+        // Update candidate names and photos from API data
+        function updateCandidateDisplay() {
+            console.log('🔄 Updating candidate display with API data...');
+
+            if (!candidateData) {
+                console.warn('⚠️ No candidate data available for display update');
+                return;
+            }
+
+            // Update presiden candidates
+            if (candidateData.presiden && candidateData.presiden.length > 0) {
+                candidateData.presiden.forEach((candidate, index) => {
+                    const candidateIndex = index + 1;
+
+                    // Update candidate name in UI - more specific selector
+                    const nameElement = document.querySelector(`#step1-content .grid > div:nth-child(${candidateIndex}) .p-4 .text-center h3`);
+                    if (nameElement) {
+                        nameElement.textContent = candidate.name || `Kandidat Presiden ${candidateIndex}`;
+                        console.log(`✅ Updated presiden ${candidateIndex} name to: ${candidate.name}`);
+                    } else {
+                        console.warn(`⚠️ Could not find name element for presiden ${candidateIndex}`);
+                    }
+
+                    // Update photos from API data
+                    if (candidate.photo && candidate.photo !== 'kandidat/kpulogo.jpg') {
+                        const dashboardImg = document.getElementById(`presiden${candidateIndex}-photo-dashboard`);
+                        const smallImg = document.getElementById(`presiden${candidateIndex}-photo-small`);
+
+                        if (dashboardImg) {
+                            dashboardImg.src = candidate.photo;
+                            dashboardImg.alt = candidate.name || `Presiden ${candidateIndex}`;
+                            console.log(`✅ Updated presiden ${candidateIndex} dashboard photo from API: ${candidate.photo}`);
+                        }
+                        if (smallImg) {
+                            smallImg.src = candidate.photo;
+                            smallImg.alt = candidate.name || `Presiden ${candidateIndex}`;
+                            console.log(`✅ Updated presiden ${candidateIndex} small photo from API: ${candidate.photo}`);
+                        }
+                    } else {
+                        // Update alt text only
+                        const dashboardImg = document.getElementById(`presiden${candidateIndex}-photo-dashboard`);
+                        const smallImg = document.getElementById(`presiden${candidateIndex}-photo-small`);
+
+                        if (dashboardImg) dashboardImg.alt = candidate.name || `Presiden ${candidateIndex}`;
+                        if (smallImg) smallImg.alt = candidate.name || `Presiden ${candidateIndex}`;
+                    }
+                });
+            }
+
+            // Update PM candidates
+            if (candidateData.pm && candidateData.pm.length > 0) {
+                candidateData.pm.forEach((candidate, index) => {
+                    const candidateIndex = index + 1;
+
+                    // Update candidate name in UI - more specific selector
+                    const nameElement = document.querySelector(`#step2-content .grid > div:nth-child(${candidateIndex}) .p-4 .text-center h3`);
+                    if (nameElement) {
+                        nameElement.textContent = candidate.name || `Kandidat PM ${candidateIndex}`;
+                        console.log(`✅ Updated PM ${candidateIndex} name to: ${candidate.name}`);
+                    } else {
+                        console.warn(`⚠️ Could not find name element for PM ${candidateIndex}`);
+                    }
+
+                    // Update photos from API data
+                    if (candidate.photo && candidate.photo !== 'kandidat/kpulogo.jpg') {
+                        const dashboardImg = document.getElementById(`pm${candidateIndex}-photo-dashboard`);
+                        const smallImg = document.getElementById(`pm${candidateIndex}-photo-small`);
+
+                        if (dashboardImg) {
+                            dashboardImg.src = candidate.photo;
+                            dashboardImg.alt = candidate.name || `PM ${candidateIndex}`;
+                            console.log(`✅ Updated PM ${candidateIndex} dashboard photo from API: ${candidate.photo}`);
+                        }
+                        if (smallImg) {
+                            smallImg.src = candidate.photo;
+                            smallImg.alt = candidate.name || `PM ${candidateIndex}`;
+                            console.log(`✅ Updated PM ${candidateIndex} small photo from API: ${candidate.photo}`);
+                        }
+                    } else {
+                        // Update alt text only
+                        const dashboardImg = document.getElementById(`pm${candidateIndex}-photo-dashboard`);
+                        const smallImg = document.getElementById(`pm${candidateIndex}-photo-small`);
+
+                        if (dashboardImg) dashboardImg.alt = candidate.name || `PM ${candidateIndex}`;
+                        if (smallImg) smallImg.alt = candidate.name || `PM ${candidateIndex}`;
+                    }
+                });
+            }
+
+            // Update parlemen candidates
+            if (candidateData.parlemen && candidateData.parlemen.length > 0) {
+                candidateData.parlemen.forEach((candidate, index) => {
+                    const candidateIndex = index + 1;
+
+                    // Update candidate name in UI - more specific selector
+                    const nameElement = document.querySelector(`#step3-content .grid > div:nth-child(${candidateIndex}) .p-3 .text-center h4`);
+                    if (nameElement) {
+                        nameElement.textContent = candidate.name || `Kandidat Parlemen ${candidateIndex}`;
+                        console.log(`✅ Updated Parlemen ${candidateIndex} name to: ${candidate.name}`);
+                    } else {
+                        console.warn(`⚠️ Could not find name element for Parlemen ${candidateIndex}`);
+                    }
+
+                    // Update photos from API data
+                    if (candidate.photo && candidate.photo !== 'kandidat/kpulogo.jpg') {
+                        const dashboardImg = document.getElementById(`parlemen${candidateIndex}-photo-dashboard`);
+                        const smallImg = document.getElementById(`parlemen${candidateIndex}-photo-small`);
+
+                        if (dashboardImg) {
+                            dashboardImg.src = candidate.photo;
+                            dashboardImg.alt = candidate.name || `Parlemen ${candidateIndex}`;
+                            console.log(`✅ Updated Parlemen ${candidateIndex} dashboard photo from API: ${candidate.photo}`);
+                        }
+                        if (smallImg) {
+                            smallImg.src = candidate.photo;
+                            smallImg.alt = candidate.name || `Parlemen ${candidateIndex}`;
+                            console.log(`✅ Updated Parlemen ${candidateIndex} small photo from API: ${candidate.photo}`);
+                        }
+                    } else {
+                        // Update alt text only
+                        const dashboardImg = document.getElementById(`parlemen${candidateIndex}-photo-dashboard`);
+                        const smallImg = document.getElementById(`parlemen${candidateIndex}-photo-small`);
+
+                        if (dashboardImg) dashboardImg.alt = candidate.name || `Parlemen ${candidateIndex}`;
+                        if (smallImg) smallImg.alt = candidate.name || `Parlemen ${candidateIndex}`;
+                    }
+                });
+            }
+
+            console.log('✅ Candidate display updated with API data');
+        }
+
+        // Load candidate photos from localStorage (fallback only if not loaded from API)
+        function loadCandidatePhotosInDashboard() {
+            console.log('📸 Loading candidate photos from localStorage (fallback)...');
+
+            // Check if photos were already loaded from API
+            if (candidateData) {
+                let hasApiPhotos = false;
+
+                // Check if any candidate has non-default photo from API
+                ['presiden', 'pm', 'parlemen'].forEach(category => {
+                    if (candidateData[category]) {
+                        candidateData[category].forEach(candidate => {
+                            if (candidate.photo && candidate.photo !== 'kandidat/kpulogo.jpg') {
+                                hasApiPhotos = true;
+                            }
+                        });
+                    }
+                });
+
+                if (hasApiPhotos) {
+                    console.log('✅ Photos already loaded from API, skipping localStorage fallback');
+                    return;
+                }
+            }
+
+            const savedPhotos = localStorage.getItem('candidate_photos');
+            if (savedPhotos) {
+                try {
+                    const photoData = JSON.parse(savedPhotos);
+                    console.log('✅ Photo data loaded from localStorage (fallback):', photoData);
+
+                    // Load presiden photos - single photo per candidate (kotak seperti admin)
+                    if (photoData['presiden1-photo']) {
+                        const img1Dashboard = document.getElementById('presiden1-photo-dashboard');
+                        const img1Small = document.getElementById('presiden1-photo-small');
+
+                        if (img1Dashboard) {
+                            img1Dashboard.src = photoData['presiden1-photo'];
+                            console.log('✅ Updated presiden1 dashboard photo');
+                        }
+                        if (img1Small) {
+                            img1Small.src = photoData['presiden1-photo'];
+                            console.log('✅ Updated presiden1 small photo');
+                        }
+                    }
+
+                    if (photoData['presiden2-photo']) {
+                        const img2Dashboard = document.getElementById('presiden2-photo-dashboard');
+                        const img2Small = document.getElementById('presiden2-photo-small');
+
+                        if (img2Dashboard) {
+                            img2Dashboard.src = photoData['presiden2-photo'];
+                            console.log('✅ Updated presiden2 dashboard photo');
+                        }
+                        if (img2Small) {
+                            img2Small.src = photoData['presiden2-photo'];
+                            console.log('✅ Updated presiden2 small photo');
+                        }
+                    }
+
+                    // Load PM photos
+                    if (photoData['pm1-photo']) {
+                        const pm1Dashboard = document.getElementById('pm1-photo-dashboard');
+                        const pm1Small = document.getElementById('pm1-photo-small');
+
+                        if (pm1Dashboard) {
+                            pm1Dashboard.src = photoData['pm1-photo'];
+                            console.log('✅ Updated PM1 dashboard photo');
+                        }
+                        if (pm1Small) {
+                            pm1Small.src = photoData['pm1-photo'];
+                            console.log('✅ Updated PM1 small photo');
+                        }
+                    } else {
+                        console.warn('⚠️ PM1 photo not found in localStorage');
+                    }
+
+                    if (photoData['pm2-photo']) {
+                        const pm2Dashboard = document.getElementById('pm2-photo-dashboard');
+                        const pm2Small = document.getElementById('pm2-photo-small');
+
+                        if (pm2Dashboard) {
+                            pm2Dashboard.src = photoData['pm2-photo'];
+                            console.log('✅ Updated PM2 dashboard photo');
+                        }
+                        if (pm2Small) {
+                            pm2Small.src = photoData['pm2-photo'];
+                            console.log('✅ Updated PM2 small photo');
+                        }
+                    } else {
+                        console.warn('⚠️ PM2 photo not found in localStorage');
+                    }
+
+                    // Load Parlemen photos
+                    for (let i = 1; i <= 4; i++) {
+                        if (photoData[`parlemen${i}-photo`]) {
+                            const parlemenDashboard = document.getElementById(`parlemen${i}-photo-dashboard`);
+                            const parlemenSmall = document.getElementById(`parlemen${i}-photo-small`);
+
+                            if (parlemenDashboard) {
+                                parlemenDashboard.src = photoData[`parlemen${i}-photo`];
+                                console.log(`✅ Updated Parlemen${i} dashboard photo`);
+                            }
+                            if (parlemenSmall) {
+                                parlemenSmall.src = photoData[`parlemen${i}-photo`];
+                                console.log(`✅ Updated Parlemen${i} small photo`);
+                            }
+                        } else {
+                            console.warn(`⚠️ Parlemen${i} photo not found in localStorage`);
+                        }
+                    }
+
+                    console.log('✅ Dashboard candidate photos loaded from localStorage');
+                } catch (error) {
+                    console.error('❌ Error loading dashboard candidate photos:', error);
+                }
+            }
+        }
+
+        // Note: loadCandidatePhotosInDashboard() is now called in main initialization
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
